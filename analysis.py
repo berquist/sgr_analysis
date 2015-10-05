@@ -7,19 +7,18 @@ import sys
 import pickle
 import csv
 
+from copy import deepcopy
+from functools import partial
+
 import numpy as np
 import numpy.linalg as npl
 import scipy.stats as sps
-
-from copy import deepcopy
 
 from analysis_utils import get_single_snapshot_results
 from analysis_utils import mangle_dict_keys
 from analysis_utils import pprint_lengths
 from analysis_utils import pprint_linregress
-
 from analysis_utils import slice_lambda
-from functools import partial
 
 
 def do_result_convergence_plots(results_d, name='frequency', n_qm_start=0, n_qm_end=2, func_to_apply=lambda x: x, ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)", labels=None, colors=None):

@@ -6,10 +6,8 @@ import re
 
 import scipy.stats as sps
 
-# What's the new way of combined reading/parsing? Can't remember.
 from cclib.parser import ccopen
 
-# from scripts.find_CO2_frequencies import find_CO2_atom_indices
 from scripts.find_CO2_frequencies import find_CO2_mode_indices
 
 
@@ -17,11 +15,12 @@ slice_lambda = lambda x, start, end: x >= start and x < end
 
 
 def make_n_mm_dict():
+    """So we can avoid having to check every loop iteration later on. Make
+    all possible keys even if we won't use the bigger values.
+    """
 
     d = dict()
 
-    # So we can avoid having to check every loop iteration later on.
-    # Make all possible keys even if we won't use the bigger values.
     keys = list(range(0, 18, 2)) + [32, 64, 128] + [256, 255, 254, 253]
     for k in keys:
         d[k] = list()
@@ -33,11 +32,7 @@ def filter_n_mm_into_dict(outputfilenames):
 
     d = make_n_mm_dict()
 
-    # first slice to take off file extension, second for 'mm'
     for outputfilename in outputfilenames:
-        # n_mm = int(outputfilename.split('_')[-1][:-4][:-2])
-        # n_mm = int(os.path.basename(outputfilename).split('_')[3][:-4][:-2])
-        # print(outputfilename)
         try:
             n_mm = int(re.search(r'_(\d+)mm', outputfilename).groups()[0])
         # Due to a silly shell mishap: `rename _0 _ ./*` is a bad idea, kids.
@@ -122,6 +117,13 @@ def get_dipoles_supersystem(outputfilenames):
 
 
 def mangle_dict_keys(d):
+    """Not all 'maximum MM' calculations are going to have 256 pairs, if
+    there are ionic liquid pairs treated explicitly; they'll take away
+    from that number, because there are 256 *total* pairs in a box.
+
+    Make it appear in a dictionary that these are all the same by
+    'having' 256 MM pairs.
+    """
 
     nd = dict()
 
@@ -186,22 +188,28 @@ def get_single_snapshot_results(snapnum, snapnums_dict, results_dict):
 def get_eda_covp_totals(outputfilepath):
     """Given a path to an output file, return the totals for each fragment from the COVP analysis.
     The first element of the tuple is the energy contribution, the second element is the
-    number of millielectrons transferred."""
+    number of millielectrons transferred.
+    """
+
     searchstr = "#   Delta E(Alpha)    Delta E(Beta)  Delta Q(Alpha)   Delta Q(Beta)"
+    remove_paren_stuff = lambda x: float(x[:-8])
+
     with open(outputfilepath) as outputfile:
         for line in outputfile:
             if searchstr in line:
                 while line[:4] != " Tot":
                     line = next(outputfile)
-                f_1_to_2 = tuple(map(lambda x: float(x[:-8]), line.split()[1::2]))
+                f_1_to_2 = tuple(map(remove_paren_stuff, line.split()[1::2]))
                 line = next(outputfile)
                 while line[:4] != " Tot":
                     line = next(outputfile)
-                f_2_to_1 = tuple(map(lambda x: float(x[:-8]), line.split()[1::2]))
+                f_2_to_1 = tuple(map(remove_paren_stuff, line.split()[1::2]))
+
     return f_1_to_2, f_2_to_1
 
 
 def sort(snapnums_dict, results_dict):
+
     assert snapnums_dict.keys() == results_dict.keys()
     for k in results_dict:
         sorting_indices = [i[0] for i in sorted(enumerate(snapnums_dict[k]),
@@ -210,27 +218,35 @@ def sort(snapnums_dict, results_dict):
                                                key=lambda x: x[0])]
         sorted_snapnums = [i[1] for i in sorted(zip(sorting_indices, snapnums_dict[k]),
                                                 key=lambda x: x[0])]
+        # Why is this commented out?
         # assert sorted_snapnums == list(range(min(snapnums_dict[k]), max(snapnums_dict[k]) + 1))
         snapnums_dict[k] = sorted_snapnums
         results_dict[k] = sorted_results
+
     return
 
 
 def get_outputfiles_from_path(path, ext=".out"):
+    """Walk the directory tree to find all potential output files.
+    """
+
     outputfiles = []
-    # Walk the directory tree to find all potential output files.
-    for (root, dirs, files) in os.walk(path):
+
+    for (root, dirs, files) in os.walk(path, followlinks=True):
         for f in files:
             if f.endswith(ext):
                 outputfiles.append(os.path.join(root, f))
+
     return sorted(outputfiles)
 
 
 def pprint_lengths(d):
+
     for upper_key in sorted(d.keys()):
         print(upper_key,
               [len(d[upper_key][lower_key])
                for lower_key in sorted(d[upper_key].keys())])
+
     return
 
 
