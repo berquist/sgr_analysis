@@ -4,7 +4,6 @@ from __future__ import print_function
 from __future__ import division
 
 import os
-import sys
 import pickle
 
 from analysis_utils import get_outputfiles_from_path
@@ -60,13 +59,13 @@ if __name__ == '__main__':
     outputs_eda_covp_3qm = []
 
     if args.file_operation == "save":
-        print("Trying to find output files...", file=sys.stderr)
+        print("Trying to find output files...")
         outputfiles = get_outputfiles_from_path(args.dir_to_search)
         with open(args.logfilename, 'w') as logfile:
             for outputfilename in outputfiles:
                 logfile.write("{}\n".format(outputfilename))
     elif args.file_operation == "read":
-        print("Reading list of output files from: {}".format(os.path.abspath(args.logfilename)), file=sys.stderr)
+        print("Reading list of output files from: {}".format(os.path.abspath(args.logfilename)))
         with open(args.logfilename) as logfile:
             content = logfile.read()
         outputfiles = content.splitlines()
@@ -79,7 +78,7 @@ if __name__ == '__main__':
         print("len(outputfiles)")
         print(len(outputfiles))
 
-    print("Sorting output files into categories...", file=sys.stderr)
+    print("Sorting output files into categories...")
     for outputfile in outputfiles:
 
         if 'freq_0qm' in outputfile:
@@ -106,7 +105,7 @@ if __name__ == '__main__':
             continue
 
     if args.debug:
-        print("Filtered lengths:", file=sys.stderr)
+        print("Filtered lengths:")
         print(len(outputs_freq_0qm))
         print(len(outputs_freq_1qm))
         print(len(outputs_freq_2qm))
@@ -118,7 +117,7 @@ if __name__ == '__main__':
         print(len(outputs_eda_covp_2qm))
         print(len(outputs_eda_covp_3qm))
 
-    print("Filtering filenames by # of MM pairs...", file=sys.stderr)
+    print("Filtering filenames by # of MM pairs...")
     filenames_freq_0qm = filter_n_mm_into_dict(outputs_freq_0qm)
     filenames_freq_1qm = filter_n_mm_into_dict(outputs_freq_1qm)
     filenames_freq_2qm = filter_n_mm_into_dict(outputs_freq_2qm)
