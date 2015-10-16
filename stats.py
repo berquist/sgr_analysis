@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
+"""stats.py: Print bin statistics.
+
+This script should be run from within each 'inputs_freq_{n_qm}'
+directory.
+"""
+
 from __future__ import print_function
 
-import re
 import os
 
 import numpy as np
 import scipy.stats as sps
-
-from cclib.parser import ccopen
-
-from scripts.find_CO2_frequencies import find_CO2_mode_indices
 
 from analysis_utils import get_CO2_frequencies
 from analysis_utils import get_outputfiles_from_path

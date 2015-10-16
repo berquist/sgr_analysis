@@ -1,3 +1,7 @@
+"""analysis_utils.py: Helper functions that are used multiple
+places.
+"""
+
 from __future__ import print_function
 from __future__ import division
 
@@ -29,6 +33,9 @@ def make_n_mm_dict():
 
 
 def filter_n_mm_into_dict(outputfilenames):
+    """Place output filenames into a dictionary where the keys are the
+    number of MM IL pairs.
+    """
 
     d = make_n_mm_dict()
 
@@ -186,9 +193,10 @@ def get_single_snapshot_results(snapnum, snapnums_dict, results_dict):
 
 
 def get_eda_covp_totals(outputfilepath):
-    """Given a path to an output file, return the totals for each fragment from the COVP analysis.
-    The first element of the tuple is the energy contribution, the second element is the
-    number of millielectrons transferred.
+    """Given a path to an output file, return the totals for each fragment
+    from the COVP analysis.  The first element of the tuple is the
+    energy contribution, the second element is the number of
+    millielectrons transferred.
     """
 
     searchstr = "#   Delta E(Alpha)    Delta E(Beta)  Delta Q(Alpha)   Delta Q(Beta)"
@@ -209,6 +217,7 @@ def get_eda_covp_totals(outputfilepath):
 
 
 def sort(snapnums_dict, results_dict):
+    """I don't think this gets called anywhere."""
 
     assert snapnums_dict.keys() == results_dict.keys()
     for k in results_dict:
@@ -241,6 +250,9 @@ def get_outputfiles_from_path(path, ext=".out"):
 
 
 def pprint_lengths(d):
+    """Pretty-print the lengths of objects inside a two-level dictionary
+    structure.
+    """
 
     for upper_key in sorted(d.keys()):
         print(upper_key,
@@ -251,6 +263,7 @@ def pprint_lengths(d):
 
 
 def pprint_linregress(x, y):
+    """Pretty-print a linear regression between x and y arrays."""
 
     slope, intercept, rval, pval, stderr = sps.linregress(x, y)
     print(" slope:     {:f}".format(slope))

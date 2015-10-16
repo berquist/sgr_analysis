@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+"""parse_outputs.py: Parse outputfiles for certain values, like
+frequencies and dipole moments, and store them in pickled
+dictionaries.
+"""
+
 from __future__ import print_function
 from __future__ import division
 
