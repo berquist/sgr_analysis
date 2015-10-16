@@ -1,0 +1,8 @@
+# -*- mode: makefile; -*-
+
+parse:
+	python ../analysis/parse_outputs.py save save --parse-frequencies --parse-dipoles
+
+analysis:
+	python ../analysis/pick_snapshots.py --csv
+	python ../analysis/analysis_0qm_0mm.py

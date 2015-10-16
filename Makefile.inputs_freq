@@ -1,0 +1,13 @@
+# -*- mode: makefile; -*-
+
+parse:
+	python ../analysis/parse_outputs.py save save --parse-frequencies --parse-dipoles
+
+analysis:
+	python ../analysis/analysis_limit_snapshots.py
+	python ../analysis/plot_snapshots.py
+
+stats:
+	cd inputs_freq_1qm_random && python ../../analysis/stats.py
+	cd inputs_freq_2qm_random && python ../../analysis/stats.py
+	cd inputs_freq_3qm_random && python ../../analysis/stats.py
