@@ -113,7 +113,8 @@ def get_dipoles(outputfilenames):
                     snapnum = int(re.search(r'drop_(\d+)_', outputfilename).groups()[0])
                     snapnums.append(snapnum)
                     # Only take the first one! This avoids problems
-                    # when parsing numerical frequency runs.
+                    # when parsing numerical frequency runs, where the
+                    # dipole appears every finite difference step.
                     break
 
     return dipoles, snapnums
@@ -152,6 +153,13 @@ def mangle_dict_keys(d):
 
 
 def get_CO2_frequencies_d(filename_dict):
+    """The filename dictionary passed as an argument should correspond to
+    only 1 # of QM pairs; that is, it's a single-layered dictionary
+    where the keys are the # of MM pairs, and the values are lists of
+    strings (outputfile names).
+
+    That means it assumes filter_n_mm_into_dict() has been called!
+    """
 
     frequencies_dict = make_n_mm_dict()
     intensities_dict = make_n_mm_dict()
@@ -165,6 +173,13 @@ def get_CO2_frequencies_d(filename_dict):
 
 
 def get_dipoles_d(filename_dict):
+    """The filename dictionary passed as an argument should correspond to
+    only 1 # of QM pairs; that is, it's a single-layered dictionary
+    where the keys are the # of MM pairs, and the values are lists of
+    strings (outputfile names).
+
+    That means it assumes filter_n_mm_into_dict() has been called!
+    """
 
     dipoles_dict = make_n_mm_dict()
     snapnums_dict = make_n_mm_dict()

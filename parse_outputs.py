@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """parse_outputs.py: Parse outputfiles for certain values, like
 frequencies and dipole moments, and store them in pickled
@@ -28,10 +28,10 @@ def getargs():
                         help="""What operation should be done for finding output files?""")
     parser.add_argument("--dir-to-search", default=".")
     parser.add_argument("--logfilename", default="outputfiles.log")
+
     parser.add_argument("parse_operation",
                         choices=("none", "save", "read"),
                         help="""What operation should be done for parsing the output files?""")
-
     parser.add_argument("--parse-frequencies", action="store_true")
     parser.add_argument("--parse-dipoles", action="store_true")
     parser.add_argument("--parse-eda", action="store_true")
