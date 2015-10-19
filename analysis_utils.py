@@ -15,7 +15,8 @@ from cclib.parser import ccopen
 from scripts.find_CO2_frequencies import find_CO2_mode_indices
 
 
-slice_lambda = lambda x, start, end: x >= start and x < end
+def slice(x, start, end):
+    return x >= start and x < end
 
 
 def make_n_mm_dict():

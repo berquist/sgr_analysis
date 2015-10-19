@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 from __future__ import division
@@ -18,7 +18,7 @@ from analysis_utils import get_single_snapshot_results
 from analysis_utils import mangle_dict_keys
 from analysis_utils import pprint_lengths
 from analysis_utils import pprint_linregress
-from analysis_utils import slice_lambda
+from analysis_utils import slice
 
 
 def do_result_convergence_plots(results_d,
@@ -30,13 +30,13 @@ def do_result_convergence_plots(results_d,
                                 labels=None,
                                 colors=None):
 
-    slice_lambda_partial = partial(slice_lambda, start=n_qm_start, end=n_qm_end + 1)
+    slice_partial = partial(slice, start=n_qm_start, end=n_qm_end + 1)
 
     print('Doing {} convergence plots'.format(name), file=sys.stderr)
 
     fig, ax = plt.subplots()
 
-    for n_qm in filter(slice_lambda_partial, sorted(results_d)):
+    for n_qm in filter(slice_partial, sorted(results_d)):
         print("Doing plots for {}".format(labels[n_qm]), file=sys.stderr)
         ticks = []
         results_single_qm_all_mm = []
@@ -100,7 +100,7 @@ def do_result_convergence_analysis(results_d,
                                    n_qm_end=2,
                                    func_to_apply=lambda x: x):
 
-    slice_lambda_partial = partial(slice_lambda, start=n_qm_start, end=n_qm_end + 1)
+    slice_partial = partial(slice, start=n_qm_start, end=n_qm_end + 1)
 
     print('Doing {} convergence analysis'.format(name), file=sys.stderr)
 
@@ -119,7 +119,7 @@ def do_result_convergence_analysis(results_d,
         'stdev',
     ])
 
-    for n_qm in filter(slice_lambda_partial, sorted(results_d)):
+    for n_qm in filter(slice_partial, sorted(results_d)):
         print("Doing analysis for {}".format(labels[n_qm]), file=sys.stderr)
         results_single_qm_all_mm = []
         results_single_qm_all_mm_mean = []
@@ -560,7 +560,6 @@ def getargs():
     parser.add_argument("--analysis-dir", default=".")
     parser.add_argument("--do-condon-plots", action="store_true")
     parser.add_argument("--do-snapshot-plots", action="store_true")
-
     parser.add_argument("--include-noCT", action="store_true")
 
     args = parser.parse_args()
