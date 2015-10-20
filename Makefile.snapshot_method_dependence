@@ -5,4 +5,4 @@ parse:
 
 analysis:
 	python ../analysis/pick_snapshots.py --csv
-	python ../analysis/analysis_0qm_0mm.py
+	python ../analysis/analysis_snapshot_method_dependence.py
