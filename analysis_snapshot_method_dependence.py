@@ -139,10 +139,6 @@ def plot_single_snapshot_frequencies(snapnum, snapnums_f, frequencies, inp_fig=N
     return
 
 
-def filter_outputfiles(l):
-    return list(filter(lambda x: '_0mm' in x, l))
-
-
 if __name__ == '__main__':
 
     # Read in the pickle files that contain all the raw data.

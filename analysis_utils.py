@@ -299,3 +299,7 @@ def read_snapshot_file(filename):
                 snapshots.add(int(line))
 
     return sorted(snapshots)
+
+
+def filter_outputfiles(l):
+    return list(filter(lambda x: '_0mm' in x, l))

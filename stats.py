@@ -13,6 +13,7 @@ import os
 import numpy as np
 import scipy.stats as sps
 
+from analysis_utils import filter_outputfiles
 from analysis_utils import get_CO2_frequencies
 from analysis_utils import get_outputfiles_from_path
 
@@ -20,7 +21,7 @@ from analysis_utils import get_outputfiles_from_path
 if __name__ == "__main__":
 
     outputfiles = get_outputfiles_from_path(os.getcwd())
-    outputfiles_0mm = [x for x in outputfiles if "_0mm" in x]
+    outputfiles_0mm = filter_outputfiles(outputfiles)
 
     # B3LYP/6-31G**
     weights_map = {
