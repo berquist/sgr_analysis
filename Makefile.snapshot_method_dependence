@@ -1,7 +1,7 @@
 # -*- mode: makefile; -*-
 
 parse:
-	python ../analysis/parse_outputs.py save save --parse-frequencies --parse-dipoles
+	python ../analysis/parse_outputs_snapshot_method_dependence.py save save
 
 analysis:
 	python ../analysis/pick_snapshots.py --csv

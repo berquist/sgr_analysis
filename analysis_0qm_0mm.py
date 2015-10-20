@@ -1,49 +1,43 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 from __future__ import division
 
-import os
 import pickle
-
-from collections import OrderedDict
 
 import numpy as np
 import numpy.linalg as npl
 
-from analysis_utils import get_CO2_frequencies
-from analysis_utils import get_dipoles
-from analysis_utils import get_outputfiles_from_path
+from parse_outputs_snapshot_method_dependence import methods
+from parse_outputs_snapshot_method_dependence import basis_sets
 
 import matplotlib as mpl
-# mpl.rc(usetex=True)
 mpl.use("Agg")
 import matplotlib.pyplot as plt
 
 
-def sort(snapnums_dict, results_dict):
-    assert snapnums_dict.keys() == results_dict.keys()
-    for k in keys:
-        sorting_indices = [i[0] for i in sorted(enumerate(snapnums_dict[k]),
-                                                key=lambda x: x[1])]
-        sorted_results = [i[1] for i in sorted(zip(sorting_indices, results_dict[k]),
-                                               key=lambda x: x[0])]
-        sorted_snapnums = [i[1] for i in sorted(zip(sorting_indices, snapnums_dict[k]),
-                                                key=lambda x: x[0])]
-        # assert sorted_snapnums == list(range(min(snapnums_dict[k]), max(snapnums_dict[k]) + 1))
-        snapnums_dict[k] = sorted_snapnums
-        results_dict[k] = sorted_results
-    return
-
-
 def get_single_snapshot_results(snapnum, snapnums_dict, results_dict):
+    """"""
+
+    single_dict = dict()
+
     assert snapnums_dict.keys() == results_dict.keys()
-    single_dict = []
-    for k in keys:
-        idx = snapnums_dict[k].index(snapnum)
-        single_result = results_dict[k][idx]
-        single_dict.append((k, single_result))
-    return OrderedDict(single_dict)
+    for method in methods:
+        assert snapnums_dict[method].keys() == results_dict[method].keys()
+        single_dict[method] = dict()
+        for basis_set in basis_sets:
+            assert snapnums_dict[method][basis_set].keys() == results_dict[method][basis_set].keys()
+            single_dict[method][basis_set] = dict()
+            for n_qm in snapnums_dict[method][basis_set]:
+                assert snapnums_dict[method][basis_set][n_qm].keys() == results_dict[method][basis_set][n_qm].keys()
+                single_dict[method][basis_set][n_qm] = dict()
+                for n_mm in snapnums_dict[method][basis_set][n_qm]:
+                    if len(snapnums_dict[method][basis_set][n_qm][n_mm]) > 0:
+                        idx = snapnums_dict[method][basis_set][n_qm][n_mm].index(snapnum)
+                        single_result = results_dict[method][basis_set][n_qm][n_mm][idx]
+                        single_dict[method][basis_set][n_qm][n_mm] = single_result
+
+    return single_dict
 
 
 def plot_single_snapshot_dipoles(snapnum, snapnums_d, dipoles, inp_fig=None, inp_ax=None):
@@ -56,20 +50,21 @@ def plot_single_snapshot_dipoles(snapnum, snapnums_d, dipoles, inp_fig=None, inp
     if inp_ax:
         ax = inp_ax
 
-    plot_list = [npl.norm(dipole) for dipole in dipoles_snap.values()]
-    print(plot_list)
-    ax.plot(ticks,
-            plot_list,
-            label=snapnum,
-            marker='o')
+    for basis_set in basis_sets:
+        plot_list = [npl.norm(dipoles_snap[method][basis_set][0][0])
+                     for method in methods]
+        ax.plot(ticks_methods,
+                plot_list,
+                label=basis_sets[basis_set],
+                marker='o')
 
     if not inp_ax:
         ax.tick_params(direction='out', top='off', right='off')
-        ax.set_xticklabels(xticklabels)
+        ax.set_xticklabels(xticklabels_methods)
         ax.set_xlabel('method', fontsize='large')
         ax.set_ylabel("total dipole moment (Debye)", fontsize='large')
         ax.set_title("snapshot {}".format(snapnum), fontsize='large')
-        # ax.legend(loc='best', fancybox=True, framealpha=0.50)
+        ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if not inp_fig:
         print('Saving dipole_snap{}.pdf'.format(snapnum))
         fig.savefig('dipole_snap{}.pdf'.format(snapnum), bbox_inches='tight')
@@ -89,21 +84,21 @@ def plot_single_snapshot_frequencies(snapnum, snapnums_f, frequencies, inp_fig=N
     if inp_ax:
         ax = inp_ax
 
-    plot_list = [frequencies_snap[k] for k in keys]
-    # plot_list = [frequency for frequency in frequencies_snap.values()]
-    print(plot_list)
-    ax.plot(ticks,
-            plot_list,
-            label=snapnum,
-            marker='o')
+    for basis_set in basis_sets:
+        plot_list = [frequencies_snap[method][basis_set][0][0]
+                     for method in methods]
+        ax.plot(ticks_methods,
+                plot_list,
+                label=basis_sets[basis_set],
+                marker='o')
 
     if not inp_ax:
         ax.tick_params(direction='out', top='off', right='off')
-        ax.set_xticklabels(xticklabels)
+        ax.set_xticklabels(xticklabels_methods)
         ax.set_xlabel('method', fontsize='large')
         ax.set_ylabel(r'$\nu_{3}$ frequency (cm$^{-1}$)', fontsize='large')
         ax.set_title("snapshot {}".format(snapnum), fontsize='large')
-        # ax.legend(loc='best', fancybox=True, framealpha=0.50)
+        ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if not inp_fig:
         print('Saving frequency_snap{}.pdf'.format(snapnum))
         fig.savefig('frequency_snap{}.pdf'.format(snapnum), bbox_inches='tight')
@@ -117,172 +112,93 @@ def filter_outputfiles(l):
     return list(filter(lambda x: '_0mm' in x, l))
 
 
+def read_snapshot_file(filename):
+
+    snapshots = set()
+
+    with open(filename) as fh:
+        for line in fh:
+            if line[0] != '#':
+                snapshots.add(int(line))
+
+    return sorted(snapshots)
+
+
 if __name__ == '__main__':
 
-    import argparse
+    # Read in the pickle files that contain all the raw data.
+    with open('frequencies.pypickle', 'rb') as picklefile:
+        frequencies = pickle.load(picklefile)
+    with open('dipoles.pypickle', 'rb') as picklefile:
+        dipoles = pickle.load(picklefile)
+    with open('snapnums_frequencies.pypickle', 'rb') as picklefile:
+        snapnums_f = pickle.load(picklefile)
+    with open('snapnums_dipoles.pypickle', 'rb') as picklefile:
+        snapnums_d = pickle.load(picklefile)
 
-    parser = argparse.ArgumentParser()
+    ticks_methods = range(len(methods))
+    xticklabels_methods = list(methods[method] for method in methods)
 
-    parser.add_argument("file_operation", choices=("none", "save", "read"))
-    parser.add_argument("parse_operation", choices=("none", "save", "read"))
-    parser.add_argument('--debug', action='store_true')
-
-    args = parser.parse_args()
-
-    keys = (
-        'hf',
-        'b3lyp',
-        'wb97x-d',
-        'blyp',
-        'tpss',
-        # 'ri-mp2',
-    )
-
-    labels = OrderedDict([
-        ('blyp', 'BLYP'),
-        ('tpss', 'TPSS'),
-        ('b3lyp', 'B3LYP'),
-        ('wb97x-d', r'$\omega$B97X-D'),
-        ('hf', 'HF'),
-        ('ri-mp2', 'RI-MP2'),
-    ])
-
-    basis_sets = OrderedDict([
-        ('6-31gdp', '6-31G**'),
-        ('cc-pvtz', 'cc-pVTZ'),
-    ])
-
-    if args.file_operation == "save":
-        print("Trying to find output files...")
-        basedir = "/home/eric/Chemistry/calc.sgr/droplets/snapshot_method_dependence"
-        outputfiles = dict()
-        for basis_set in basis_sets:
-            outputfiles[basis_set] = []
-            for k in keys:
-                curr_outputfiles = filter_outputfiles(get_outputfiles_from_path(os.path.join(basedir, "inputs_freq_0qm_{k}_{basis_set}".format(k=k, basis_set=basis_set))))
-                outputfiles[basis_set].append((k, curr_outputfiles))
-            outputfiles[basis_set] = OrderedDict(outputfiles[basis_set])
-        with open('outputfiles.pypickle', 'wb') as picklefile:
-            pickle.dump(outputfiles, picklefile)
-    elif args.file_operation == "read":
-        print("Reading list of output files from: {}".format(os.path.abspath("outputfiles.pypickle")))
-        with open("outputfiles.pypickle", "rb") as picklefile:
-            outputfiles = pickle.load(picklefile)
-    elif args.file_operation == "none":
-        pass
-    else:
-        raise Exception
-
-    if args.debug:
-        print(outputfiles)
-
-    if args.parse_operation == "save":
-        print("Extracting valuable information from outputs...")
-        frequencies = dict()
-        intensities = dict()
-        snapnums_f = dict()
-        dipoles = dict()
-        snapnums_d = dict()
-        print("Parsing frequencies/intensities...")
-        for basis_set in basis_sets:
-            frequencies[basis_set] = []
-            intensities[basis_set] = []
-            snapnums_f[basis_set] = []
-            dipoles[basis_set] = []
-            snapnums_d[basis_set] = []
-            for k in outputfiles[basis_set]:
-                k_frequencies, k_intensities, k_snapnums_f = get_CO2_frequencies(outputfiles[basis_set][k])
-                frequencies[basis_set].append((k, k_frequencies))
-                intensities[basis_set].append((k, k_intensities))
-                snapnums_f[basis_set].append((k, k_snapnums_f))
-        print("Parsing dipoles...")
-        for basis_set in basis_sets:
-            dipoles[basis_set] = []
-            snapnums_d[basis_set] = []
-            for k in outputfiles[basis_set]:
-                k_dipoles, k_snapnums_d = get_dipoles(outputfiles[basis_set][k])
-                dipoles[basis_set].append((k, k_dipoles))
-                snapnums_d[basis_set].append((k, k_snapnums_d))
-        for basis_set in basis_sets:
-            frequencies[basis_set] = OrderedDict(frequencies[basis_set])
-            intensities[basis_set] = OrderedDict(intensities[basis_set])
-            snapnums_f[basis_set] = OrderedDict(snapnums_f[basis_set])
-            dipoles[basis_set] = OrderedDict(dipoles[basis_set])
-            snapnums_d[basis_set] = OrderedDict(snapnums_d[basis_set])
-        with open('frequencies.pypickle', 'wb') as picklefile:
-            pickle.dump(frequencies, picklefile)
-        with open('intensities.pypickle', 'wb') as picklefile:
-            pickle.dump(intensities, picklefile)
-        with open('dipoles.pypickle', 'wb') as picklefile:
-            pickle.dump(dipoles, picklefile)
-        with open('snapnums_frequencies.pypickle', 'wb') as picklefile:
-            pickle.dump(snapnums_f, picklefile)
-        with open('snapnums_dipoles.pypickle', 'wb') as picklefile:
-            pickle.dump(snapnums_d, picklefile)
-    elif args.parse_operation == "read":
-        print("Reading frequency data from: {}".format(os.path.abspath('frequencies.pypickle')))
-        with open('frequencies.pypickle', 'rb') as picklefile:
-            frequencies = pickle.load(picklefile)
-        print("Reading intensity data from: {}".format(os.path.abspath('intensities.pypickle')))
-        with open('intensities.pypickle', 'rb') as picklefile:
-            intensities = pickle.load(picklefile)
-        print("Reading dipole data from: {}".format(os.path.abspath('dipoles.pypickle')))
-        with open('dipoles.pypickle', 'rb') as picklefile:
-            dipoles = pickle.load(picklefile)
-        print("Reading snapshot number data from: {}".format(os.path.abspath('snapnums_frequencies.pypickle')))
-        with open('snapnums_frequencies.pypickle', 'rb') as picklefile:
-            snapnums_f = pickle.load(picklefile)
-        print("Reading snapshot number data from: {}".format(os.path.abspath('snapnums_dipoles.pypickle')))
-        with open('snapnums_dipoles.pypickle', 'rb') as picklefile:
-            snapnums_d = pickle.load(picklefile)
-    elif args.parse_operation == "none":
-        pass
-    else:
-        raise Exception
-
-    ticks = range(len(keys))
-    xticklabels = list(labels[k] for k in keys)
-
-    cutoff = -1
-    means_frequencies = [np.mean(frequencies[k][:cutoff])
-                         for k in keys]
-    means_dipole_moments = [np.mean([npl.norm(dipole) for dipole in dipoles[k][:cutoff]])
-                            for k in keys]
+    means_frequencies = [np.mean(frequencies[method]['6-31gdp'][0][0])
+                         for method in methods]
+    means_dipole_moments = [np.mean([npl.norm(dipole)
+                                     for dipole in dipoles[method]['6-31gdp'][0][0]])
+                            for method in methods]
 
     ##################################################
 
+    # Plot the mean frequencies for each method using the 6-31G**
+    # basis set over the 0,0 snapshots.
+
     fig, ax = plt.subplots()
 
-    ax.plot(ticks, means_frequencies, marker='s', color='green')
+    ax.plot(ticks_methods,
+            means_frequencies,
+            marker='s',
+            color='green')
 
-    ax.set_xticks(ticks)
-    ax.set_xticklabels(xticklabels)
+    ax.set_xticks(ticks_methods)
+    ax.set_xticklabels(xticklabels_methods)
     ax.set_xlabel('method', fontsize='large')
     ax.set_ylabel(r'$\nu_{3}$ frequency (cm$^{-1}$)', fontsize='large')
 
-    fig.savefig('frequencies_line.pdf', bbox_inches='tight')
+    fig.savefig('frequencies_mean_6-31gdp.pdf', bbox_inches='tight')
 
     ##################################################
+
+    # Plot the mean dipole moments for each method using the 6-31G**
+    # basis set over the 0,0 snapshots.
 
     fig, ax = plt.subplots()
 
-    ax.plot(ticks, means_dipole_moments, marker='s', color='green')
+    ax.plot(ticks_methods,
+            means_dipole_moments,
+            marker='s',
+            color='green')
 
-    ax.set_xticks(ticks)
-    ax.set_xticklabels(xticklabels)
+    ax.set_xticks(ticks_methods)
+    ax.set_xticklabels(xticklabels_methods)
     ax.set_xlabel('method', fontsize='large')
     ax.set_ylabel('total dipole moment (Debye)', fontsize='large')
 
-    fig.savefig('dipole_moments_line.pdf', bbox_inches='tight')
+    fig.savefig('dipole_moments_mean_6-31gdp.pdf', bbox_inches='tight')
 
     ##################################################
+
+    # Plot the mean frequencies (increasing scale) and mean dipole
+    # moments (decreasing scale) together for each method using the
+    # 6-31G** basis set over the 0,0 snapshots.
 
     ax1_color = 'blue'
     ax2_color = 'green'
 
     fig, ax1 = plt.subplots()
 
-    ax1.plot(ticks, means_frequencies, marker='s', linestyle='-', color=ax1_color)
+    ax1.plot(ticks_methods,
+             means_frequencies,
+             marker='s',
+             linestyle='-',
+             color=ax1_color)
 
     ax1.set_ylabel(r'$\nu_{3}$ frequency (cm$^{-1}$)', fontsize='large')
 
@@ -291,7 +207,11 @@ if __name__ == '__main__':
 
     ax2 = ax1.twinx()
 
-    ax2.plot(ticks, means_dipole_moments, marker='*', linestyle='--', color=ax2_color)
+    ax2.plot(ticks_methods,
+             means_dipole_moments,
+             marker='*',
+             linestyle='--',
+             color=ax2_color)
 
     ax2.set_ylabel('total dipole moment (Debye)', fontsize='large')
 
@@ -300,75 +220,44 @@ if __name__ == '__main__':
     for tl in ax2.get_yticklabels():
         tl.set_color(ax2_color)
 
-    ax1.set_xticks(ticks)
-    ax1.set_xticklabels(xticklabels)
+    ax1.set_xticks(ticks_methods)
+    ax1.set_xticklabels(xticklabels_methods)
     ax1.set_xlabel('method', fontsize='large')
 
     ax1.tick_params(direction='out', top='off', right='off')
     ax2.tick_params(direction='out', top='off', left='off')
 
-    fig.savefig('frequencies_dipole_moments_combined_line.pdf', bbox_inches='tight')
+    filename = 'frequencies_dipole_moments_mean_6-31gdp.pdf'
+    print('Saving {}'.format(filename))
+    fig.savefig(filename, bbox_inches='tight')
 
     ##################################################
 
-    snapnums = (25, 50, 75, 100)
-    # snapnums = [random.randrange(1, cutoff + 1) for _ in range(5)]
-
-    # for snapnum in snapnums:
-    #     print(snapnum, get_single_snapshot_results(snapnum, snapnums_f, frequencies))
-
-    # for snapnum in snapnums:
-    #     plot_single_snapshot_frequencies(snapnum, snapnums_f, frequencies)
-    #     plot_single_snapshot_dipoles(snapnum, snapnums_d, dipoles)
+    snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_3qm")
+    print('snapshot numbers:', snapnums)
+    for snapnum in snapnums:
+        plot_single_snapshot_frequencies(snapnum, snapnums_f, frequencies)
+        plot_single_snapshot_dipoles(snapnum, snapnums_d, dipoles)
 
     ##################################################
 
-    fig, ax = plt.subplots()
-    for snapnum in snapnums:
-        plot_single_snapshot_dipoles(snapnum, snapnums_d, dipoles, inp_ax=ax, inp_fig=fig)
-    ax.tick_params(direction='out', top='off', right='off')
-    ax.set_xticks(ticks)
-    ax.set_xticklabels(xticklabels)
-    ax.set_xlabel('method', fontsize='large')
-    ax.set_ylabel("total dipole moment (Debye)", fontsize='large')
-    ax.legend(loc='best', fancybox=True, framealpha=0.50)
-    print('Saving dipole_snapshots.pdf')
-    fig.savefig('dipole_snapshots.pdf', bbox_inches='tight')
-
-    plt.close(fig)
-
-    fig, ax = plt.subplots()
-    for snapnum in snapnums:
-        plot_single_snapshot_frequencies(snapnum, snapnums_d, frequencies, inp_ax=ax, inp_fig=fig)
-    ax.tick_params(direction='out', top='off', right='off')
-    ax.set_xticks(ticks)
-    ax.set_xticklabels(xticklabels)
-    ax.set_xlabel('method', fontsize='large')
-    ax.set_ylabel(r'$\nu_{3}$ frequency (cm$^{-1}$)', fontsize='large')
-    ax.legend(loc='best', fancybox=True, framealpha=0.50)
-    print('Saving frequency_snapshots.pdf')
-    fig.savefig('frequency_snapshots.pdf', bbox_inches='tight')
-
-    plt.close(fig)
-
-    ###
-
-    cutoff = 100
-    # xticklabels_traj = list(snapnums_f.values())[:cutoff]
-    # ticks_traj = range(1, len() + 1)
+    cutoff = 75
+    nticks = 5
 
     fig, ax = plt.subplots()
 
-    for k in keys:
-        ax.plot(frequencies[k][:cutoff], label=labels[k])
+    # one series for each method used
+    for method in methods:
+        ax.plot(frequencies[method]['6-31gdp'][0][0][:cutoff],
+                label=methods[method])
 
-    # ax.set_xticks(ticks_traj)
-    # ax.set_xticklabels(xticklabels_traj)
     ax.set_xlabel('snapshot #', fontsize='large')
     ax.set_ylabel(r'$\nu_{3}$ frequency (cm$^{-1}$)', fontsize='large')
     ax.tick_params(direction='out', top='off', right='off')
     ax.legend(fancybox=True, loc='upper right', framealpha=0.50)
 
-    fig.savefig('frequencies.pdf', bbox_inches='tight')
+    filename = 'trajectory_frequencies_6-31gdp.pdf'
+    print('Saving {}'.format(filename))
+    fig.savefig(filename, bbox_inches='tight')
 
     ##################################################
