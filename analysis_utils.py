@@ -288,3 +288,14 @@ def pprint_linregress(x, y):
     print(" rval2:     {:f}".format(rsq))
 
     return slope, intercept, rsq
+
+def read_snapshot_file(filename):
+
+    snapshots = set()
+
+    with open(filename) as fh:
+        for line in fh:
+            if line[0] != '#':
+                snapshots.add(int(line))
+
+    return sorted(snapshots)

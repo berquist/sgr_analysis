@@ -10,6 +10,8 @@ from collections import OrderedDict
 import numpy as np
 import numpy.linalg as npl
 
+from analysis_utils import read_snapshot_file
+
 from parse_outputs_snapshot_method_dependence import methods
 from parse_outputs_snapshot_method_dependence import basis_sets
 
@@ -139,18 +141,6 @@ def plot_single_snapshot_frequencies(snapnum, snapnums_f, frequencies, inp_fig=N
 
 def filter_outputfiles(l):
     return list(filter(lambda x: '_0mm' in x, l))
-
-
-def read_snapshot_file(filename):
-
-    snapshots = set()
-
-    with open(filename) as fh:
-        for line in fh:
-            if line[0] != '#':
-                snapshots.add(int(line))
-
-    return sorted(snapshots)
 
 
 if __name__ == '__main__':
