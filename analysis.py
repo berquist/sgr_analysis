@@ -16,8 +16,8 @@ import scipy.stats as sps
 
 from analysis_utils import get_single_snapshot_results
 from analysis_utils import mangle_dict_keys
-from analysis_utils import pprint_lengths
 from analysis_utils import pprint_linregress
+from analysis_utils import read_snapshot_file
 from analysis_utils import slice
 
 
@@ -54,16 +54,7 @@ def do_result_convergence_plots(results_d,
                 color=colors[n_qm])
 
     ax.set_xscale('symlog', basex=2)
-    # ax.set_xticks(possible_keys)
-    # ax.set_xticklabels(possible_keys)
-    # ax.xaxis.set_major_locator(mpl.ticker.FixedLocator(locs=range(len(possible_keys))))
     ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
-    # x_locator = ax.xaxis.get_major_locator()
-    # x_locator_vals = x_locator()
-    # vmin, vmax = x_locator_vals[0], x_locator_vals[-1]
-    # tick_values = ax.xaxis.get_major_locator().tick_values(vmin, vmax)
-    # print(x_locator_vals)
-    # print(tick_values)
 
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
@@ -76,14 +67,9 @@ def do_result_convergence_plots(results_d,
 
     ax.set_xscale('linear')
 
-    # majorlocator = mpl.ticker.MultipleLocator(2.0)
-    # minorlocator = mpl.ticker.MultipleLocator(0.5)
-    # ax.yaxis.set_major_locator(majorlocator)
-    # ax.yaxis.set_minor_locator(minorlocator)
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
     ax.set_xlim((possible_keys[0], possible_keys[rlim]))
-    # ax.set_ylim((2515.0, 2530.0))
     fig.savefig('{}/{}_convergence_{}.pdf'.format(args.analysis_dir,
                                                   name,
                                                   possible_keys[rlim]),
@@ -405,6 +391,9 @@ def plot_single_snapshot_frequencies_qm_gaps(snapnum,
     ax.plot(n_mm_ticks_1_2, gaps_1_2, marker='p', color='green', label=r'$\Delta\omega_{2-1\,\mathrm{QM}}$')
     ax.plot(n_mm_ticks_2_3, gaps_2_3, marker='*', color='blue', label=r'$\Delta\omega_{3-2\,\mathrm{QM}}$')
 
+    ax.set_xscale('symlog', basex=2)
+    ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
+
     ax.set_ylim(ax.get_ylim()[::-1])
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
@@ -415,6 +404,8 @@ def plot_single_snapshot_frequencies_qm_gaps(snapnum,
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
     print('Saving {}/frequency_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
     fig.savefig('{}/frequency_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
+
+    ax.set_xscale('linear')
 
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
@@ -466,6 +457,9 @@ def plot_single_snapshot_intensities_qm_gaps(snapnum,
     ax.plot(n_mm_ticks_1_2, gaps_1_2, marker='p', color='green', label=r'$\Delta I_{2-1\,\mathrm{QM}}$')
     ax.plot(n_mm_ticks_2_3, gaps_2_3, marker='*', color='blue', label=r'$\Delta I_{3-2\,\mathrm{QM}}$')
 
+    ax.set_xscale('symlog', basex=2)
+    ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
+
     ax.set_ylim(ax.get_ylim()[::-1])
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
@@ -476,6 +470,8 @@ def plot_single_snapshot_intensities_qm_gaps(snapnum,
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
     print('Saving {}/intensity_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
     fig.savefig('{}/intensity_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
+
+    ax.sex_xscale('linear')
 
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
@@ -527,6 +523,9 @@ def plot_single_snapshot_dipoles_qm_gaps(snapnum,
     ax.plot(n_mm_ticks_1_2, gaps_1_2, marker='p', color='green', label=r'$\Delta\mu_{2-1\,\mathrm{QM}}$')
     ax.plot(n_mm_ticks_2_3, gaps_2_3, marker='*', color='blue', label=r'$\Delta\mu_{3-2\,\mathrm{QM}}$')
 
+    ax.set_xscale('symlog', basex=2)
+    ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
+
     ax.set_ylim(ax.get_ylim()[::-1])
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
@@ -537,6 +536,8 @@ def plot_single_snapshot_dipoles_qm_gaps(snapnum,
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
     print('Saving {}/dipole_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
     fig.savefig('{}/dipole_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
+
+    ax.set_xscale('linear')
 
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
@@ -555,7 +556,6 @@ def getargs():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--debug", action="store_true")
     parser.add_argument("--mpl-usetex", action="store_true")
     parser.add_argument("--analysis-dir", default=".")
     parser.add_argument("--do-condon-plots", action="store_true")
@@ -618,24 +618,6 @@ if __name__ == '__main__':
     snapnums_frequencies_noCT_d = mangle_dict_keys(snapnums_frequencies_noCT_d)
     snapnums_dipoles_d = mangle_dict_keys(snapnums_dipoles_d)
 
-    if args.debug:
-        print("pprint_lengths(frequencies_CO2_d)")
-        pprint_lengths(frequencies_CO2_d)
-        print("pprint_lengths(intensities_CO2_d)")
-        pprint_lengths(intensities_CO2_d)
-        print("pprint_lengths(snapnums_frequencies_d)")
-        pprint_lengths(snapnums_frequencies_d)
-        print("pprint_lengths(frequencies_noCT_CO2_d)")
-        pprint_lengths(frequencies_noCT_CO2_d)
-        print("pprint_lengths(intensities_noCT_CO2_d)")
-        pprint_lengths(intensities_noCT_CO2_d)
-        print("pprint_lengths(snapnums_frequencies_noCT_d)")
-        pprint_lengths(snapnums_frequencies_noCT_d)
-        print("pprint_lengths(dipoles_d)")
-        pprint_lengths(dipoles_d)
-        print("pprint_lengths(snapnums_dipoles_d)")
-        pprint_lengths(snapnums_dipoles_d)
-
     possible_keys = list(range(0, 18, 2)) + [32, 64, 128, 256]
 
     markers = [
@@ -671,28 +653,31 @@ if __name__ == '__main__':
     ]
 
     ###################################
-    ### Do some simple statistical analysis on the data sets and dump them to CSV files.
 
-    do_result_convergence_analysis(frequencies_CO2_d, name='frequency', n_qm_start=0, n_qm_end=2)
-    do_result_convergence_analysis(intensities_CO2_d, name='intensity', n_qm_start=0, n_qm_end=2)
-    do_result_convergence_analysis(dipoles_d, name='dipole', n_qm_start=1, n_qm_end=2, func_to_apply=npl.norm)
+    # Do some simple statistical analysis on the data sets and dump them to CSV files.
+
+    do_result_convergence_analysis(frequencies_CO2_d, name='frequency', n_qm_start=0, n_qm_end=3)
+    # do_result_convergence_analysis(intensities_CO2_d, name='intensity', n_qm_start=0, n_qm_end=2)
+    # do_result_convergence_analysis(dipoles_d, name='dipole', n_qm_start=1, n_qm_end=2, func_to_apply=npl.norm)
     if args.include_noCT:
         do_result_convergence_analysis(frequencies_noCT_CO2_d, name='frequency_noCT', n_qm_start=1, n_qm_end=2)
         do_result_convergence_analysis(intensities_noCT_CO2_d, name='intensity_noCT', n_qm_start=1, n_qm_end=2)
 
     ###################################
-    ### plots!
 
-    do_result_convergence_plots(frequencies_CO2_d, name='frequency', n_qm_start=0, n_qm_end=2, ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)", labels=labels, colors=colors)
-    do_result_convergence_plots(intensities_CO2_d, name='intensity', n_qm_start=0, n_qm_end=2, ylabel=r"$\nu_{3}$ intensity (cm$^{-1}$)", labels=labels, colors=colors)
-    do_result_convergence_plots(dipoles_d, name='dipole', n_qm_start=1, n_qm_end=2, ylabel='total dipole moment (Debye)', func_to_apply=npl.norm, labels=labels, colors=colors)
-    do_result_convergence_plots(dipoles_d, name='dipole_0qm', n_qm_start=0, n_qm_end=1, ylabel='total dipole moment (Debye)', func_to_apply=npl.norm, labels=labels, colors=colors)
+    # plots!
+
+    do_result_convergence_plots(frequencies_CO2_d, name='frequency', n_qm_start=0, n_qm_end=3, ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)", labels=labels, colors=colors)
+    # do_result_convergence_plots(intensities_CO2_d, name='intensity', n_qm_start=0, n_qm_end=2, ylabel=r"$\nu_{3}$ intensity (cm$^{-1}$)", labels=labels, colors=colors)
+    # do_result_convergence_plots(dipoles_d, name='dipole', n_qm_start=1, n_qm_end=2, ylabel='total dipole moment (Debye)', func_to_apply=npl.norm, labels=labels, colors=colors)
+    # do_result_convergence_plots(dipoles_d, name='dipole_0qm', n_qm_start=0, n_qm_end=0, ylabel='total dipole moment (Debye)', func_to_apply=npl.norm, labels=labels, colors=colors)
     if args.include_noCT:
         do_result_convergence_plots(frequencies_noCT_CO2_d, name='frequency_noCT', n_qm_start=1, n_qm_end=2, ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)", labels=labels_noCT, colors=colors_noCT)
         do_result_convergence_plots(intensities_noCT_CO2_d, name='intensity_noCT', n_qm_start=1, n_qm_end=2, ylabel=r"$\nu_{3}$ intensity (cm$^{-1}$)", labels=labels_noCT, colors=colors_noCT)
 
     ###################################
-    ### testing whether or not the Condon approximation is appropriate
+
+    # testing whether or not the Condon approximation is appropriate
 
     fig, ax = plt.subplots()
 
@@ -756,36 +741,37 @@ if __name__ == '__main__':
     if args.do_condon_plots:
         fig.savefig('{}/condon_approximation.pdf'.format(args.analysis_dir), bbox_inches='tight')
 
-    ### now add the no CT data
+    # now add the no CT data
 
-    for n_qm in sorted(frequencies_noCT_CO2_d):
-        frequencies_single_qm_all_mm = []
-        intensities_single_qm_all_mm = []
-        for n_mm in possible_keys:
-            f = frequencies_noCT_CO2_d[n_qm][n_mm]
-            i = intensities_noCT_CO2_d[n_qm][n_mm]
-            assert len(f) == len(i)
-            frequencies_single_qm_all_mm.extend(f)
-            intensities_single_qm_all_mm.extend(i)
-            frequencies_all.extend(f)
-            intensities_all.extend(i)
-            print('{} QM/{} MM'.format(n_qm, n_mm))
-        assert len(frequencies_single_qm_all_mm) == len(intensities_single_qm_all_mm)
-        ax.scatter(frequencies_single_qm_all_mm,
-                   intensities_single_qm_all_mm,
-                   marker=markers_noCT[n_qm],
-                   label=labels_noCT[n_qm],
-                   color=colors_noCT[n_qm])
-        print('{} QM/all MM'.format(n_qm))
+    if args.include_noCT:
+        for n_qm in sorted(frequencies_noCT_CO2_d):
+            frequencies_single_qm_all_mm = []
+            intensities_single_qm_all_mm = []
+            for n_mm in possible_keys:
+                f = frequencies_noCT_CO2_d[n_qm][n_mm]
+                i = intensities_noCT_CO2_d[n_qm][n_mm]
+                assert len(f) == len(i)
+                frequencies_single_qm_all_mm.extend(f)
+                intensities_single_qm_all_mm.extend(i)
+                frequencies_all.extend(f)
+                intensities_all.extend(i)
+                print('{} QM/{} MM'.format(n_qm, n_mm))
+            assert len(frequencies_single_qm_all_mm) == len(intensities_single_qm_all_mm)
+            ax.scatter(frequencies_single_qm_all_mm,
+                       intensities_single_qm_all_mm,
+                       marker=markers_noCT[n_qm],
+                       label=labels_noCT[n_qm],
+                       color=colors_noCT[n_qm])
+            print('{} QM/all MM'.format(n_qm))
 
-    ax.legend(loc='lower right',
-              fancybox=True,
-              framealpha=0.50,
-              numpoints=1,
-              scatterpoints=1)
+        ax.legend(loc='lower right',
+                  fancybox=True,
+                  framealpha=0.50,
+                  numpoints=1,
+                  scatterpoints=1)
 
-    if args.do_condon_plots:
-        fig.savefig('{}/condon_approximation_noCT.pdf'.format(args.analysis_dir), bbox_inches='tight')
+        if args.do_condon_plots:
+            fig.savefig('{}/condon_approximation_noCT.pdf'.format(args.analysis_dir), bbox_inches='tight')
 
     csvfile.close()
 
@@ -794,10 +780,13 @@ if __name__ == '__main__':
     ######################################################################
 
     if args.do_snapshot_plots:
-        for snapnum in list(range(1, 3)):
+
+        snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_3qm")
+        print('snapshot numbers:', snapnums)
+        for snapnum in snapnums:
             plot_single_snapshot_frequencies(snapnum, snapnums_frequencies_d, frequencies_CO2_d)
             plot_single_snapshot_frequencies_qm_gaps(snapnum, snapnums_frequencies_d, frequencies_CO2_d)
-            plot_single_snapshot_intensities(snapnum, snapnums_frequencies_d, intensities_CO2_d)
-            plot_single_snapshot_intensities_qm_gaps(snapnum, snapnums_frequencies_d, intensities_CO2_d)
-            plot_single_snapshot_dipoles(snapnum, snapnums_dipoles_d, dipoles_d)
-            plot_single_snapshot_dipoles_qm_gaps(snapnum, snapnums_dipoles_d, dipoles_d)
+            # plot_single_snapshot_intensities(snapnum, snapnums_frequencies_d, intensities_CO2_d)
+            # plot_single_snapshot_intensities_qm_gaps(snapnum, snapnums_frequencies_d, intensities_CO2_d)
+            # plot_single_snapshot_dipoles(snapnum, snapnums_dipoles_d, dipoles_d)
+            # plot_single_snapshot_dipoles_qm_gaps(snapnum, snapnums_dipoles_d, dipoles_d)

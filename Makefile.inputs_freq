@@ -4,8 +4,8 @@ parse:
 	python ../analysis/parse_outputs.py save save --parse-frequencies --parse-dipoles
 
 analysis:
-	python ../analysis/analysis_limit_snapshots.py
-	python ../analysis/plot_snapshots.py
+	# python ../analysis/plot_snapshots.py
+	python ../analysis/analysis.py --do-condon-plots --do-snapshot-plots
 
 stats:
 	cd inputs_freq_1qm_random && python ../../analysis/stats.py
