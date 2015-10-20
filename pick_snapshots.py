@@ -1,68 +1,43 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 from __future__ import division
 
+import sys
 import math
 import pickle
-
-from collections import OrderedDict
 
 import numpy as np
 import scipy.stats as sps
 
+from parse_outputs_snapshot_method_dependence import methods
+from parse_outputs_snapshot_method_dependence import basis_sets
+from analysis_snapshot_method_dependence import linestyles
+from analysis_snapshot_method_dependence import colors
 
-keys = (
-    'hf',
-    'b3lyp',
-    'wb97x-d',
-    'blyp',
-    'tpss',
-    # 'ri-mp2',
-)
-
-methods = OrderedDict([
-    ('blyp', 'BLYP'),
-    ('tpss', 'TPSS'),
-    ('b3lyp', 'B3LYP'),
-    ('wb97x-d', r'$\omega$B97X-D'),
-    ('hf', 'HF'),
-    # ('ri-mp2', 'RI-MP2'),
-])
-
-basis_sets = OrderedDict([
-    ('6-31gdp', '6-31G**'),
-    ('cc-pvtz', 'cc-pVTZ'),
-])
-
-colors = OrderedDict([
-    ('blyp', 'blue'),
-    ('tpss', 'cyan'),
-    ('b3lyp', 'red'),
-    ('wb97x-d', 'orange'),
-    ('hf', 'black'),
-    ('ri-mp2', 'grey'),
-])
-
-linestyles = OrderedDict([
-    ('6-31gdp', '-'),
-    ('cc-pvtz', '--'),
-])
+import matplotlib as mpl
+mpl.use("Agg")
+import matplotlib.pyplot as plt
 
 
 def getargs():
+    """Get command-line arguments."""
 
     import argparse
 
     parser = argparse.ArgumentParser()
-
-    parser.add_argument('--debug', action='store_true')
 
     parser.add_argument('--csv', action='store_true')
 
     parser.add_argument('--sample-method', default='b3lyp')
     parser.add_argument('--sample-basis-set', default='6-31gdp')
     parser.add_argument('--numbins', type=int, default=5)
+
+    parser.add_argument('--do-file-operations', action='store_true')
+
+    parser.add_argument('--dir-droplets',
+                        default='/home/eric/Chemistry/calc.sgr/droplets/inputs_freq',
+                        help="""This is the root directory to look for all files.""")
 
     args = parser.parse_args()
 
@@ -106,22 +81,18 @@ def bin_snapshots(frequencies, snapnums, numbins, center, binwidth):
         masked_snapnums = snapnums[mask]
         masked_frequencies = frequencies[mask]
         binned_snapshots.append(masked_snapnums)
-        if args.debug:
-            print('edges:', bin_edges[binidx-1], bin_edges[binidx])
-            print('mask')
-            print(mask)
-            print('masked_snapnums')
-            print(masked_snapnums)
-            print('masked_frequenices')
-            print(masked_frequencies)
 
     return binned_snapshots
 
 
 def do_sanity_check():
+    """Do a sanity check and ..."""
+
     for ts in total_samples:
         print([[map_snapshot_to_frequency[sn] for sn in bs]
                for bs in chosen_snapshots[ts]])
+
+    return
 
 
 def do_file_operations(chosen_snapshots):
@@ -138,8 +109,8 @@ def do_file_operations(chosen_snapshots):
     the possible # MM pair matches.
     """
 
-    import sys
     import shutil
+
     from scripts.vmd_templates import pad_left_zeros
 
 
@@ -164,10 +135,6 @@ def do_file_operations(chosen_snapshots):
 
 if __name__ == '__main__':
 
-    import matplotlib as mpl
-    mpl.use('Agg')
-    import matplotlib.pyplot as plt
-
     args = getargs()
 
     # Read in the pickle files that contain all the raw data.
@@ -176,15 +143,6 @@ if __name__ == '__main__':
     with open('snapnums_frequencies.pypickle', 'rb') as picklefile:
         snapnums_d = pickle.load(picklefile)
 
-    assert frequencies_d.keys() == snapnums_d.keys()
-    for k in frequencies_d:
-        assert frequencies_d[k].keys() == snapnums_d[k].keys() == methods.keys()
-
-    ### Plots and summary statistics.
-
-    fig, ax = plt.subplots()
-    fig_combined_hists, ax_combined_hists = plt.subplots()
-
     # Write the means and standard deviations to a CSV file if asked.
     if args.csv:
         import csv
@@ -192,10 +150,15 @@ if __name__ == '__main__':
         csvwriter = csv.writer(csvfh)
         csvwriter.writerow(['method', 'basis set', 'mean', 'stdev (pop)'])
 
+    fig, ax = plt.subplots()
+    fig_combined_hists, ax_combined_hists = plt.subplots()
+
     for basis_set in basis_sets:
         for method in methods:
 
-            pairs = sorted(zip(snapnums_d[basis_set][method], frequencies_d[basis_set][method]), key=lambda x: x[1])
+            pairs = sorted(zip(snapnums_d[method][basis_set][0][0],
+                               frequencies_d[method][basis_set][0][0]),
+                           key=lambda x: x[1])
             snapnums = [x[0] for x in pairs]
             frequencies = [x[1] for x in pairs]
 
@@ -288,6 +251,9 @@ if __name__ == '__main__':
 
         plt.close(fig)
 
+        # Add the experimental xxx/xxx frequency as a stick.
+        # Is there a way to avoid hard-coding the "intensity" and have
+        # it determined automatically?
         ax_combined_hists.stem([2340.0], [0.004],
                                linefmt='k:',
                                markerfmt='k:')
@@ -311,8 +277,8 @@ if __name__ == '__main__':
     print('****** SAMPLING')
     print('*** method   : {}'.format(methods[method]))
     print('*** basis set: {}'.format(basis_sets[basis_set]))
-    pairs = sorted(zip(snapnums_d[basis_set][method],
-                       frequencies_d[basis_set][method]),
+    pairs = sorted(zip(snapnums_d[method][basis_set][0][0],
+                       frequencies_d[method][basis_set][0][0]),
                    key=lambda x: x[1])
     snapnums = np.array([x[0] for x in pairs])
     frequencies = np.array([x[1] for x in pairs])
@@ -346,10 +312,6 @@ if __name__ == '__main__':
     samples_per_bin = total_samples / numbins
     binned_snapshots = bin_snapshots(frequencies, snapnums, numbins, center, binwidth)
 
-    if args.debug:
-        print('binned_snapshots')
-        print(binned_snapshots)
-
     chosen_snapshots = {ts : [] for ts in total_samples}
 
     # Pre-populate the first set of chosen snapshots, since this is
@@ -371,10 +333,11 @@ if __name__ == '__main__':
     # As a sanity check, what are the frequencies that these snapshots
     # correspond to?
 
-    # do_sanity_check()
+    do_sanity_check()
 
-    dir_droplets = '/home/eric/Chemistry/calc.sgr/droplets/inputs_freq'
-
+    # These are the total number of snapshots we want to sample for
+    # each number of QM pairs available; number is decreasing due to
+    # increasing cost.
     map_n_qm_to_num_snapshots = {
         1: 100,
         2: 25,
@@ -388,11 +351,11 @@ if __name__ == '__main__':
     import os
 
     do_file_operations_p = True
-    res = glob(os.path.join(dir_droplets, 'representative_snapshots_*qm*'))
+    res = glob(os.path.join(args.dir_droplets, 'representative_snapshots_*qm*'))
     if len(res) > 0:
-        # If we already have results on disk, write over whatever
-        # we've already chosen, but we're going to assume the
-        # distribution is the same.
+        # If we already have results on disk, read them in and write
+        # over whatever we've already chosen, but we're going to
+        # assume the distribution is the same.
         chosen_snapshots = dict()
         do_file_operations_p = False
         for r in res:
@@ -401,19 +364,24 @@ if __name__ == '__main__':
                 chomp = stub.split('_')
                 n_qm = int(chomp[2][0])
                 binnum = int(chomp[4])
-                # This isn't a good file format for
-                # reproducibility...fix me!
                 with open(r) as binfile:
                     snapnums = sorted(map(int, binfile.readlines()))
                     chosen_snapshots[(n_qm, binnum)] = snapnums
 
     print('(n_qm, binnum): chosen snapshot numbers:')
-    for ((n_qm, binnum), snapnums) in chosen_snapshots.items():
+    for ((n_qm, binnum), snapnums) in sorted(chosen_snapshots.items()):
         print('({}, {}): {}'.format(n_qm, binnum, snapnums))
 
     # Make directories and copy the snapshots over.
-    # if do_file_operations_p:
-    #     do_file_operations(chosen_snapshots)
+
+    if do_file_operations_p:
+        print('We can do file operations.')
+        # Only do this if we really, really want to.
+        if args.do_file_operations:
+            print('Actually going to do file operations.')
+            do_file_operations(chosen_snapshots)
+    else:
+        print("We can't do file operations.")
 
     if args.csv:
         csvfh.close()

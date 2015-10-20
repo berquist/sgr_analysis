@@ -5,6 +5,8 @@ from __future__ import division
 
 import pickle
 
+from collections import OrderedDict
+
 import numpy as np
 import numpy.linalg as npl
 
@@ -16,8 +18,27 @@ mpl.use("Agg")
 import matplotlib.pyplot as plt
 
 
+colors = OrderedDict([
+    ('blyp', 'blue'),
+    ('tpss', 'cyan'),
+    ('b3lyp', 'red'),
+    ('wb97x-d', 'orange'),
+    ('hf', 'black'),
+    ('ri-mp2', 'grey'),
+])
+
+
+linestyles = OrderedDict([
+    ('6-31gdp', '-'),
+    ('cc-pvtz', '--'),
+])
+
+
 def get_single_snapshot_results(snapnum, snapnums_dict, results_dict):
-    """"""
+    """For a given snapshot number, get the single 'result' (frequency,
+    intensity, dipole, etc.) corresponding to it, maintaining the original
+    dictionary structure.
+    """
 
     single_dict = dict()
 
@@ -41,6 +62,9 @@ def get_single_snapshot_results(snapnum, snapnums_dict, results_dict):
 
 
 def plot_single_snapshot_dipoles(snapnum, snapnums_d, dipoles, inp_fig=None, inp_ax=None):
+    """Plot the dipole moment of a single snapshot as a function of its
+    method and basis set.
+    """
 
     dipoles_snap = get_single_snapshot_results(snapnum, snapnums_d, dipoles)
 
@@ -66,8 +90,9 @@ def plot_single_snapshot_dipoles(snapnum, snapnums_d, dipoles, inp_fig=None, inp
         ax.set_title("snapshot {}".format(snapnum), fontsize='large')
         ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if not inp_fig:
-        print('Saving dipole_snap{}.pdf'.format(snapnum))
-        fig.savefig('dipole_snap{}.pdf'.format(snapnum), bbox_inches='tight')
+        filename = 'dipole_snap{}.pdf'.format(snapnum)
+        print('Saving {}'.format(filename))
+        fig.savefig(filename, bbox_inches='tight')
 
         plt.close(fig)
 
@@ -75,6 +100,9 @@ def plot_single_snapshot_dipoles(snapnum, snapnums_d, dipoles, inp_fig=None, inp
 
 
 def plot_single_snapshot_frequencies(snapnum, snapnums_f, frequencies, inp_fig=None, inp_ax=None):
+    """Plot the CO2 v3 frequency of a single snapshot as a function of its
+    method and basis set.
+    """
 
     frequencies_snap = get_single_snapshot_results(snapnum, snapnums_f, frequencies)
 
@@ -100,8 +128,9 @@ def plot_single_snapshot_frequencies(snapnum, snapnums_f, frequencies, inp_fig=N
         ax.set_title("snapshot {}".format(snapnum), fontsize='large')
         ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if not inp_fig:
-        print('Saving frequency_snap{}.pdf'.format(snapnum))
-        fig.savefig('frequency_snap{}.pdf'.format(snapnum), bbox_inches='tight')
+        filename = 'frequency_snap{}.pdf'.format(snapnum)
+        print('Saving {}'.format(filename))
+        fig.savefig(filename, bbox_inches='tight')
 
         plt.close(fig)
 
@@ -241,8 +270,11 @@ if __name__ == '__main__':
 
     ##################################################
 
-    cutoff = 75
+    cutoff = 50
     nticks = 5
+    step = cutoff // nticks
+    ticks_traj = list(range(0, (cutoff + step), step))
+    ticks_traj[0] = 1
 
     fig, ax = plt.subplots()
 
@@ -251,6 +283,8 @@ if __name__ == '__main__':
         ax.plot(frequencies[method]['6-31gdp'][0][0][:cutoff],
                 label=methods[method])
 
+    ax.set_xticks(ticks_traj)
+    ax.set_xlim((min(ticks_traj), max(ticks_traj)))
     ax.set_xlabel('snapshot #', fontsize='large')
     ax.set_ylabel(r'$\nu_{3}$ frequency (cm$^{-1}$)', fontsize='large')
     ax.tick_params(direction='out', top='off', right='off')
