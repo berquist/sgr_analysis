@@ -3,7 +3,6 @@
 from __future__ import print_function
 from __future__ import division
 
-import sys
 import pickle
 import csv
 
@@ -32,12 +31,12 @@ def do_result_convergence_plots(results_d,
 
     slice_partial = partial(slice, start=n_qm_start, end=n_qm_end + 1)
 
-    print('Doing {} convergence plots'.format(name), file=sys.stderr)
+    print('Doing {} convergence plots'.format(name))
 
     fig, ax = plt.subplots()
 
     for n_qm in filter(slice_partial, sorted(results_d)):
-        print("Doing plots for {}".format(labels[n_qm]), file=sys.stderr)
+        print("Doing plots for {}".format(labels[n_qm]))
         ticks = []
         results_single_qm_all_mm = []
         results_single_qm_all_mm_mean = []
@@ -88,7 +87,7 @@ def do_result_convergence_analysis(results_d,
 
     slice_partial = partial(slice, start=n_qm_start, end=n_qm_end + 1)
 
-    print('Doing {} convergence analysis'.format(name), file=sys.stderr)
+    print('Doing {} convergence analysis'.format(name))
 
     csvfile = open('{}/{}_convergence.csv'.format(args.analysis_dir, name), 'w')
     csvwriter = csv.writer(csvfile)
@@ -106,7 +105,7 @@ def do_result_convergence_analysis(results_d,
     ])
 
     for n_qm in filter(slice_partial, sorted(results_d)):
-        print("Doing analysis for {}".format(labels[n_qm]), file=sys.stderr)
+        print("Doing analysis for {}".format(labels[n_qm]))
         results_single_qm_all_mm = []
         results_single_qm_all_mm_mean = []
         results_single_qm_all_mm_median = []
@@ -213,7 +212,7 @@ def plot_single_snapshot_dipoles(snapnum,
         ax.set_title("snapshot {}".format(snapnum))
         ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if do_manip_fig:
-        print('Saving {}/dipole_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
+        print('Saving {}/dipole_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum))
         fig.savefig('{}/dipole_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
 
     if do_manip_ax:
@@ -222,7 +221,7 @@ def plot_single_snapshot_dipoles(snapnum,
         ax.set_xticks(possible_keys[:rlim + 1])
         ax.set_xlim((possible_keys[0], possible_keys[rlim]))
     if do_manip_fig:
-        print('Saving {}/dipole_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), file=sys.stderr)
+        print('Saving {}/dipole_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]))
         fig.savefig('{}/dipole_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), bbox_inches='tight')
 
         plt.close(fig)
@@ -274,7 +273,7 @@ def plot_single_snapshot_intensities(snapnum,
         ax.set_title("snapshot {}".format(snapnum))
         ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if do_manip_fig:
-        print('Saving {}/intensity_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
+        print('Saving {}/intensity_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum))
         fig.savefig('{}/intensity_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
 
     if do_manip_ax:
@@ -283,7 +282,7 @@ def plot_single_snapshot_intensities(snapnum,
         ax.set_xticks(possible_keys[:rlim + 1])
         ax.set_xlim((possible_keys[0], possible_keys[rlim]))
     if do_manip_fig:
-        print('Saving {}/intensity_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), file=sys.stderr)
+        print('Saving {}/intensity_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]))
         fig.savefig('{}/intensity_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), bbox_inches='tight')
 
         plt.close(fig)
@@ -335,7 +334,7 @@ def plot_single_snapshot_frequencies(snapnum,
         ax.set_title("snapshot {}".format(snapnum))
         ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if do_manip_fig:
-        print('Saving {}/frequency_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
+        print('Saving {}/frequency_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum))
         fig.savefig('{}/frequency_convergence_snap{}.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
 
     if do_manip_ax:
@@ -344,7 +343,7 @@ def plot_single_snapshot_frequencies(snapnum,
         ax.set_xticks(possible_keys[:rlim + 1])
         ax.set_xlim((possible_keys[0], possible_keys[rlim]))
     if do_manip_fig:
-        print('Saving {}/frequency_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), file=sys.stderr)
+        print('Saving {}/frequency_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]))
         fig.savefig('{}/frequency_convergence_snap{}_{}.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), bbox_inches='tight')
 
         plt.close(fig)
@@ -402,7 +401,7 @@ def plot_single_snapshot_frequencies_qm_gaps(snapnum,
     ax.set_ylabel(r'difference in $\nu_{3}$ frequencies (cm$^{-1}$)')
     ax.set_title('snapshot {} gaps'.format(snapnum))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
-    print('Saving {}/frequency_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
+    print('Saving {}/frequency_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum))
     fig.savefig('{}/frequency_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
 
     ax.set_xscale('linear')
@@ -410,7 +409,7 @@ def plot_single_snapshot_frequencies_qm_gaps(snapnum,
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
     ax.set_xlim((possible_keys[0], possible_keys[rlim]))
-    print('Saving {}/frequency_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), file=sys.stderr)
+    print('Saving {}/frequency_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]))
     fig.savefig('{}/frequency_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), bbox_inches='tight')
 
     plt.close(fig)
@@ -468,7 +467,7 @@ def plot_single_snapshot_intensities_qm_gaps(snapnum,
     ax.set_ylabel(r'difference in $\nu_{3}$ intensities (km/mol)')
     ax.set_title('snapshot {} gaps'.format(snapnum))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
-    print('Saving {}/intensity_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
+    print('Saving {}/intensity_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum))
     fig.savefig('{}/intensity_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
 
     ax.sex_xscale('linear')
@@ -476,7 +475,7 @@ def plot_single_snapshot_intensities_qm_gaps(snapnum,
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
     ax.set_xlim((possible_keys[0], possible_keys[rlim]))
-    print('Saving {}/intensity_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), file=sys.stderr)
+    print('Saving {}/intensity_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]))
     fig.savefig('{}/intensity_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), bbox_inches='tight')
 
     plt.close(fig)
@@ -534,7 +533,7 @@ def plot_single_snapshot_dipoles_qm_gaps(snapnum,
     ax.set_ylabel(r'difference in total dipole moment (Debye)')
     ax.set_title('snapshot {} gaps'.format(snapnum))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
-    print('Saving {}/dipole_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), file=sys.stderr)
+    print('Saving {}/dipole_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum))
     fig.savefig('{}/dipole_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, snapnum), bbox_inches='tight')
 
     ax.set_xscale('linear')
@@ -542,7 +541,7 @@ def plot_single_snapshot_dipoles_qm_gaps(snapnum,
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
     ax.set_xlim((possible_keys[0], possible_keys[rlim]))
-    print('Saving {}/dipole_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), file=sys.stderr)
+    print('Saving {}/dipole_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]))
     fig.savefig('{}/dipole_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, snapnum, possible_keys[rlim]), bbox_inches='tight')
 
     plt.close(fig)
@@ -696,7 +695,7 @@ if __name__ == '__main__':
     ])
 
     for n_qm in sorted(frequencies_CO2_d):
-        print("Forming Condon approximation plot for {}".format(labels[n_qm]), file=sys.stderr)
+        print("Forming Condon approximation plot for {}".format(labels[n_qm]))
         frequencies_single_qm_all_mm = []
         intensities_single_qm_all_mm = []
         for n_mm in possible_keys:
