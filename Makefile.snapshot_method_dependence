@@ -1,8 +1,11 @@
 # -*- mode: makefile; -*-
 
+ANALYSIS_DIR=../analysis
+
 parse:
-	python ../analysis/parse_outputs_snapshot_method_dependence.py save save
+	python ${ANALYSIS_DIR}/parse_outputs_snapshot_method_dependence.py save save
 
 analysis:
-	python ../analysis/pick_snapshots.py --csv
-	python ../analysis/analysis_snapshot_method_dependence.py
+	python ${ANALYSIS_DIR}/analysis_histograms.py --numbins=5
+	python ${ANALYSIS_DIR}/pick_snapshots.py --sample-method=b3lyp --sample-basis-set=6-31gdp --numbins=5
+	python ${ANALYSIS_DIR}/analysis_snapshot_method_dependence.py
