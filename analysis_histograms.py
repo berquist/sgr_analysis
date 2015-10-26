@@ -165,7 +165,8 @@ def analysis_single(numbins, n_qm, n_mm):
     ax_hist.stem([2340.0],
                  [ax_hist.get_ylim()[1]],
                  linefmt='k:',
-                 markerfmt='k:')
+                 markerfmt='k:',
+                 label='experiment')
 
     ax_hist.legend(fancybox=True, loc='upper right', framealpha=0.50)
     filename = 'hist_{}qm_{}mm_{}.pdf'.format(n_qm, n_mm, numbins)
@@ -264,7 +265,8 @@ def analysis_all_methods_all_basis_sets(numbins):
             ax_hist.stem([2340.0],
                          [ax_hist.get_ylim()[1]],
                          linefmt='k:',
-                         markerfmt='k:')
+                         markerfmt='k:',
+                         label='experiment')
 
             ax_hist.legend(fancybox=True, loc='upper right', framealpha=0.50)
             fig_hist.savefig('hist_{}_{}_{}.pdf'.format(method, basis_set, numbins), bbox_inches='tight')
@@ -298,7 +300,8 @@ def analysis_all_methods_all_basis_sets(numbins):
         ax_combined_hists.stem([2340.0],
                                [ax_combined_hists.get_ylim()[1]],
                                linefmt='k:',
-                               markerfmt='k:')
+                               markerfmt='k:',
+                               label='experiment')
 
         ax_combined_hists.set_xlabel(r'$\nu_3$ frequency (cm$^{-1}$)')
         ax_combined_hists.set_ylabel('arbitrary units')
