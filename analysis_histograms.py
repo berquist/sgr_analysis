@@ -101,7 +101,79 @@ def make_bin_dictionary(total_samples, binned_snapshots, samples_per_bin):
     return chosen_snapshots
 
 
-def analysis(numbins):
+def analysis_single(numbins, n_qm, n_mm):
+
+    pairs = sorted(zip(snapnums_d[n_qm][n_mm],
+                       frequencies_d[n_qm][n_mm]),
+                   key=lambda x: x[1])
+    print(pairs)
+    snapnums = [x[0] for x in pairs]
+    frequencies = [x[1] for x in pairs]
+
+    mmin = min(frequencies)
+    mmax = max(frequencies)
+    rng = mmax - mmin
+    mean = np.mean(frequencies)
+    median = np.median(frequencies)
+    mode = sps.mode(frequencies)
+    stdev_pop = np.std(frequencies, ddof=1)
+    stdev_sample = np.std(frequencies, ddof=0)
+
+    print(' min           : {:.2f}'.format(mmin))
+    print(' max           : {:.2f}'.format(mmax))
+    print(' range         : {:.2f}'.format(rng))
+    print(' mean          : {:.3f}'.format(mean))
+    print(' median        : {:.3f}'.format(median))
+    print(' mode          : {}'.format(mode))
+    print(' stdev (pop)   : {:.3f}'.format(stdev_pop))
+    print(' stdev (sample): {:.3f}'.format(stdev_sample))
+
+    center = mean
+    binwidth = stdev_pop
+    bins = make_bin_edges(numbins, center, binwidth)
+
+    print(' bins: {}'.format(bins))
+
+    hist, bin_edges = np.histogram(frequencies, bins)
+    weights = hist / sum(hist)
+
+    print(' histogram: {}'.format(hist))
+    print(' weights  : {}'.format(weights))
+
+    # If you specify the bins, the edges that are returned are
+    # identical to the input.
+    assert bins.all() == bin_edges.all()
+
+    fig_hist, ax_hist = plt.subplots()
+
+    n, bins_mpl, _ = ax_hist.hist(frequencies, bins=bin_edges, normed=True)
+
+    linspace_bins = np.linspace(bins[0], bins[-1], 300)
+    linspace_all = np.linspace(mmin, mmax, 300)
+    pdf_bins = norm_pdf(linspace_bins, mu=center, sigma=binwidth)
+    pdf_all = norm_pdf(linspace_all, mu=center, sigma=binwidth)
+    print('sum(pdf_bins): {}'.format(sum(pdf_bins)))
+    print('sum(pdf_all) : {}'.format(sum(pdf_all)))
+    ax_hist.plot(linspace_bins,
+                 pdf_bins,
+                 label='probability density function',
+                 color='red',
+                 linewidth=3,
+                 linestyle='--')
+
+    ax_hist.legend(fancybox=True, loc='upper right', framealpha=0.50)
+    filename = 'hist_{}qm_{}mm_{}.pdf'.format(n_qm, n_mm, numbins)
+    fig_hist.savefig(filename, bbox_inches='tight')
+
+    plt.close(fig_hist)
+
+    # NumPy and matplotlib are doing the same thing for the bins.
+    assert bin_edges.all() == bins_mpl.all()
+
+    return
+
+
+def analysis_all_methods_all_basis_sets(numbins):
 
     # Write the means and standard deviations to a CSV file if asked.
     # if args.csv:
@@ -241,9 +313,16 @@ def getargs():
 
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('analysis_type',
+                        choices=('snapshot_method_dependence',
+                                 'single'))
+
     parser.add_argument('--csv', action='store_true')
 
     parser.add_argument('--numbins', type=int, default=5)
+
+    parser.add_argument('--n_qm', type=int)
+    parser.add_argument('--n_mm', type=int)
 
     args = parser.parse_args()
 
@@ -261,4 +340,11 @@ if __name__ == '__main__':
     with open('snapnums_frequencies.pypickle', 'rb') as picklefile:
         snapnums_d = pickle.load(picklefile)
 
-    analysis(numbins=args.numbins)
+    if args.analysis_type == 'snapshot_method_dependence':
+        analysis_all_methods_all_basis_sets(numbins=args.numbins)
+    elif args.analysis_type == 'single':
+        analysis_single(numbins=args.numbins,
+                        n_qm=args.n_qm,
+                        n_mm=args.n_mm)
+    else:
+        pass

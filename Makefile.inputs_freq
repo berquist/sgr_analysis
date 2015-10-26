@@ -1,13 +1,16 @@
 # -*- mode: makefile; -*-
 
+ANALYSIS_DIR=../analysis
+
 parse:
-	python ../analysis/parse_outputs.py save save --parse-frequencies --parse-dipoles
+	python ${ANALYSIS_DIR}/parse_outputs.py save save --parse-frequencies --parse-dipoles
 
 analysis:
-	# python ../analysis/plot_snapshots.py
-	python ../analysis/analysis.py --do-condon-plots --do-snapshot-plots
+	python ${ANALYSIS_DIR}/analysis_histograms.py single --n_qm=2 --n_mm=254 --numbins=5
+	# python ${ANALYSIS_DIR}/plot_snapshots.py
+	python ${ANALYSIS_DIR}/analysis.py --do-condon-plots --do-snapshot-plots
 
 stats:
-	cd inputs_freq_1qm_random && python ../../analysis/stats.py
-	cd inputs_freq_2qm_random && python ../../analysis/stats.py
-	cd inputs_freq_3qm_random && python ../../analysis/stats.py
+	cd inputs_freq_1qm_random && python ../${ANALYSIS_DIR}/stats.py
+	cd inputs_freq_2qm_random && python ../${ANALYSIS_DIR}/stats.py
+	cd inputs_freq_3qm_random && python ../${ANALYSIS_DIR}/stats.py
