@@ -13,11 +13,116 @@ import numpy as np
 import numpy.linalg as npl
 import scipy.stats as sps
 
+from analysis_utils import filter_snapshots
 from analysis_utils import get_single_snapshot_results
 from analysis_utils import mangle_dict_keys
 from analysis_utils import pprint_linregress
 from analysis_utils import read_snapshot_file
 from analysis_utils import slice
+
+
+def condon():
+    """Testing whether or not the Condon approximation is appropriate."""
+
+    fig, ax = plt.subplots()
+
+    frequencies_all = []
+    intensities_all = []
+
+    csvfile = open('condon_analysis_linear_regression.csv', 'w')
+    csvwriter = csv.writer(csvfile)
+    csvwriter.writerow([
+        '# QM',
+        '# MM',
+        '# points',
+        'slope',
+        'intercept',
+        'rsq',
+    ])
+
+    for n_qm in sorted(frequencies_CO2_d):
+        print("Forming Condon approximation plot for {}".format(labels[n_qm]))
+        frequencies_single_qm_all_mm = []
+        intensities_single_qm_all_mm = []
+        for n_mm in possible_keys:
+            f = frequencies_CO2_d[n_qm][n_mm]
+            i = intensities_CO2_d[n_qm][n_mm]
+            assert len(f) == len(i)
+            frequencies_single_qm_all_mm.extend(f)
+            intensities_single_qm_all_mm.extend(i)
+            frequencies_all.extend(f)
+            intensities_all.extend(i)
+            print('{} QM/{} MM'.format(n_qm, n_mm))
+            slope, intercept, rsq = pprint_linregress(f, i)
+            csvwriter.writerow([n_qm, n_mm, len(f), slope, intercept, rsq])
+        assert len(frequencies_single_qm_all_mm) == len(intensities_single_qm_all_mm)
+        ax.scatter(frequencies_single_qm_all_mm,
+                   intensities_single_qm_all_mm,
+                   marker=markers[n_qm],
+                   label=labels[n_qm],
+                   color=colors[n_qm])
+        print('{} QM/all MM'.format(n_qm))
+        slope, intercept, rsq = pprint_linregress(frequencies_single_qm_all_mm,
+                                                  intensities_single_qm_all_mm)
+        csvwriter.writerow([n_qm, 'all', len(frequencies_single_qm_all_mm), slope, intercept, rsq])
+
+    assert len(frequencies_all) == len(intensities_all)
+    print('all QM/all MM')
+    slope, intercept, rsq = pprint_linregress(frequencies_all, intensities_all)
+    csvwriter.writerow(['all', 'all', len(frequencies_all), slope, intercept, rsq])
+
+    ax.set_ylim((0.0, 1000.0))
+    y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
+    ax.yaxis.set_major_formatter(y_formatter)
+    ax.tick_params(direction='out', top='off', right='off')
+    ax.set_xlabel(r"$\nu_{3}$ frequency (cm$^{-1}$)")
+    ax.set_ylabel(r"$\nu_{3}$ intensity (km/mol)")
+    ax.set_title("Condon approximation")
+    ax.legend(loc='lower right',
+              fancybox=True,
+              framealpha=0.50,
+              numpoints=1,
+              scatterpoints=1)
+    if args.do_condon_plots:
+        fig.savefig('condon_approximation.pdf', bbox_inches='tight')
+
+    # now add the no CT data
+
+    if args.include_noCT:
+        for n_qm in sorted(frequencies_noCT_CO2_d):
+            frequencies_single_qm_all_mm = []
+            intensities_single_qm_all_mm = []
+            for n_mm in possible_keys:
+                f = frequencies_noCT_CO2_d[n_qm][n_mm]
+                i = intensities_noCT_CO2_d[n_qm][n_mm]
+                assert len(f) == len(i)
+                frequencies_single_qm_all_mm.extend(f)
+                intensities_single_qm_all_mm.extend(i)
+                frequencies_all.extend(f)
+                intensities_all.extend(i)
+                print('{} QM/{} MM'.format(n_qm, n_mm))
+            assert len(frequencies_single_qm_all_mm) == len(intensities_single_qm_all_mm)
+            ax.scatter(frequencies_single_qm_all_mm,
+                       intensities_single_qm_all_mm,
+                       marker=markers_noCT[n_qm],
+                       label=labels_noCT[n_qm],
+                       color=colors_noCT[n_qm])
+            print('{} QM/all MM'.format(n_qm))
+
+        ax.legend(loc='lower right',
+                  fancybox=True,
+                  framealpha=0.50,
+                  numpoints=1,
+                  scatterpoints=1)
+
+        if args.do_condon_plots:
+            fig.savefig('condon_approximation_noCT.pdf', bbox_inches='tight')
+
+    csvfile.close()
+
+    plt.close(fig)
+
+    return
 
 
 def do_result_convergence_plots(results_d,
@@ -62,16 +167,14 @@ def do_result_convergence_plots(results_d,
     ax.set_ylabel(ylabel)
     ax.set_title("{} convergence w.r.t. # IL pairs treated via QM".format(name))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
-    fig.savefig('{}/{}_convergence.pdf'.format(args.analysis_dir, name), bbox_inches='tight')
+    fig.savefig('{}_convergence.pdf'.format(name), bbox_inches='tight')
 
     ax.set_xscale('linear')
 
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
     ax.set_xlim((possible_keys[0], possible_keys[rlim]))
-    fig.savefig('{}/{}_convergence_{}.pdf'.format(args.analysis_dir,
-                                                  name,
-                                                  possible_keys[rlim]),
+    fig.savefig('{}_convergence_{}.pdf'.format(name, possible_keys[rlim]),
                 bbox_inches='tight')
 
     plt.close(fig)
@@ -79,13 +182,14 @@ def do_result_convergence_plots(results_d,
     fig, ax = plt.subplots()
 
     ticks = list(filter(slice_partial, sorted(results_d)))
-    results_single_qm_0_mm_mean = [np.mean([func_to_apply(x)
-                                            for x in results_d[n_qm][0]])
-                                   for n_qm in ticks]
-    ax.plot(ticks,
-            results_single_qm_0_mm_mean,
-            marker='o',
-            color='black')
+    for n_mm in possible_keys:
+        results = [np.mean([func_to_apply(x)
+                            for x in results_d[n_qm][n_mm]])
+                   for n_qm in ticks]
+        ax.plot(ticks,
+                results,
+                marker='o',
+                label=n_mm)
 
     ax.set_xticks(ticks)
     ax.set_xticklabels(ticks)
@@ -93,8 +197,79 @@ def do_result_convergence_plots(results_d,
     ax.tick_params(direction='out', top='off', right='off')
     ax.set_xlabel("# QM IL pairs")
     ax.set_ylabel('mean {}'.format(ylabel))
+    ax.legend(loc='best', fancybox=True, framealpha=0.50)
+    fig.savefig('{}_convergence_n_qm.pdf'.format(name), bbox_inches='tight')
 
-    fig.savefig('{}/{}_convergence_n_qm.pdf'.format(args.analysis_dir, name), bbox_inches='tight')
+    plt.close(fig)
+
+    return
+
+
+def do_result_convergence_plots_gaps(results_d,
+                                     name='frequency',
+                                     func_to_apply=lambda x: x,
+                                     ylabel=r'$\nu_{3}$ frequency (cm$^{-1}$)',
+                                     symbol='\omega'):
+
+    fig, ax = plt.subplots()
+
+    gaps_0_1 = []
+    gaps_1_2 = []
+    gaps_2_3 = []
+    n_mm_ticks_0_1 = []
+    n_mm_ticks_1_2 = []
+    n_mm_ticks_2_3 = []
+
+    for n_mm in possible_keys:
+        try:
+            gap_0_1 = np.mean(func_to_apply(results_d[1][n_mm])) - np.mean(func_to_apply(results_d[0][n_mm]))
+            gaps_0_1.append(gap_0_1)
+            n_mm_ticks_0_1.append(n_mm)
+        except:
+            pass
+        try:
+            gap_1_2 = np.mean(func_to_apply(results_d[2][n_mm])) - np.mean(func_to_apply(results_d[1][n_mm]))
+            gaps_1_2.append(gap_1_2)
+            n_mm_ticks_1_2.append(n_mm)
+        except:
+            pass
+        try:
+            gap_2_3 = np.mean(func_to_apply(results_d[3][n_mm])) - np.mean(func_to_apply(results_d[2][n_mm]))
+            gaps_2_3.append(gap_2_3)
+            n_mm_ticks_2_3.append(n_mm)
+        except:
+            pass
+
+    ax.plot(n_mm_ticks_0_1, gaps_0_1, marker='s', color='red',
+            label='$\Delta {symbol}_{{1-0\,\mathrm{{QM}}}}$'.format(**locals()))
+    ax.plot(n_mm_ticks_1_2, gaps_1_2, marker='p', color='green',
+            label='$\Delta {symbol}_{{2-1\,\mathrm{{QM}}}}$'.format(**locals()))
+    ax.plot(n_mm_ticks_2_3, gaps_2_3, marker='*', color='blue',
+            label='$\Delta {symbol}_{{3-2\,\mathrm{{QM}}}}$'.format(**locals()))
+
+    ax.set_xscale('symlog', basex=2)
+    ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
+
+    ax.set_ylim(ax.get_ylim()[::-1])
+    y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
+    ax.yaxis.set_major_formatter(y_formatter)
+    ax.tick_params(direction='out', top='off', right='off')
+    ax.set_xlabel('# IL pairs treated as point charges')
+    ax.set_ylabel(r'difference in {}'.format(ylabel))
+    ax.set_title('gaps')
+    ax.legend(loc='best', fancybox=True, framealpha=0.50)
+    filename = '{}_convergence_gaps.pdf'.format(name)
+    print('Saving {}'.format(filename))
+    fig.savefig(filename, bbox_inches='tight')
+
+    ax.set_xscale('linear')
+
+    rlim = -5
+    ax.set_xticks(possible_keys[:rlim + 1])
+    ax.set_xlim((possible_keys[0], possible_keys[rlim]))
+    filename = '{}_convergence_{}_gaps.pdf'.format(name, possible_keys[rlim])
+    print('Saving {}'.format(filename))
+    fig.savefig(filename, bbox_inches='tight')
 
     plt.close(fig)
 
@@ -111,7 +286,7 @@ def do_result_convergence_analysis(results_d,
 
     print('Doing {} convergence analysis'.format(name))
 
-    csvfile = open('{}/{}_convergence.csv'.format(args.analysis_dir, name), 'w')
+    csvfile = open('{}_convergence.csv'.format(name), 'w')
     csvwriter = csv.writer(csvfile)
     csvwriter.writerow([
         '# QM',
@@ -237,8 +412,9 @@ def plot_single_snapshot_results(snapnum,
         ax.set_title("snapshot {}".format(snapnum))
         ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if do_manip_fig:
-        print('Saving {}/{}_convergence_snap{}.pdf'.format(args.analysis_dir, name, snapnum))
-        fig.savefig('{}/{}_convergence_snap{}.pdf'.format(args.analysis_dir, name, snapnum), bbox_inches='tight')
+        filename = '{}_convergence_snap{}.pdf'.format(name, snapnum)
+        print('Saving {}'.format(filename))
+        fig.savefig(filename, bbox_inches='tight')
 
     if do_manip_ax:
         ax.set_xscale('linear')
@@ -246,8 +422,9 @@ def plot_single_snapshot_results(snapnum,
         ax.set_xticks(possible_keys[:rlim + 1])
         ax.set_xlim((possible_keys[0], possible_keys[rlim]))
     if do_manip_fig:
-        print('Saving {}/{}_convergence_snap{}_{}.pdf'.format(args.analysis_dir, name, snapnum, possible_keys[rlim]))
-        fig.savefig('{}/{}_convergence_snap{}_{}.pdf'.format(args.analysis_dir, name, snapnum, possible_keys[rlim]), bbox_inches='tight')
+        filename = '{}_convergence_snap{}_{}.pdf'.format(name, snapnum, possible_keys[rlim])
+        print('Saving {}'.format(filename))
+        fig.savefig(filename, bbox_inches='tight')
 
         plt.close(fig)
 
@@ -313,16 +490,18 @@ def plot_single_snapshot_results_qm_gaps(snapnum,
     ax.set_ylabel(r'difference in {}'.format(ylabel))
     ax.set_title('snapshot {} gaps'.format(snapnum))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
-    print('Saving {}/{}_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, name, snapnum))
-    fig.savefig('{}/{}_convergence_snap{}_gaps.pdf'.format(args.analysis_dir, name, snapnum), bbox_inches='tight')
+    filename = '{}_convergence_snap{}_gaps.pdf'.format(name, snapnum)
+    print('Saving {}'.format(filename))
+    fig.savefig(filename, bbox_inches='tight')
 
     ax.set_xscale('linear')
 
     rlim = -5
     ax.set_xticks(possible_keys[:rlim + 1])
     ax.set_xlim((possible_keys[0], possible_keys[rlim]))
-    print('Saving {}/{}_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, name, snapnum, possible_keys[rlim]))
-    fig.savefig('{}/{}_convergence_snap{}_{}_gaps.pdf'.format(args.analysis_dir, name, snapnum, possible_keys[rlim]), bbox_inches='tight')
+    filename = '{}_convergence_snap{}_{}_gaps.pdf'.format(name, snapnum, possible_keys[rlim])
+    print('Saving {}'.format(filename))
+    fig.savefig(filename, bbox_inches='tight')
 
     plt.close(fig)
 
@@ -336,7 +515,6 @@ def getargs():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--mpl-usetex", action="store_true")
-    parser.add_argument("--analysis-dir", default=".")
     parser.add_argument("--do-condon-plots", action="store_true")
     parser.add_argument("--do-snapshot-plots", action="store_true")
     parser.add_argument("--include-noCT", action="store_true")
@@ -470,6 +648,11 @@ if __name__ == '__main__':
                                 ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
                                 labels=labels,
                                 colors=colors)
+    do_result_convergence_plots_gaps(frequencies_CO2_d,
+                                     name='frequency',
+                                     func_to_apply=lambda x: x,
+                                     ylabel=r'$\nu_{3}$ frequency (cm$^{-1}$)',
+                                     symbol='\omega')
     do_result_convergence_plots(intensities_CO2_d,
                                 name='intensity',
                                 n_qm_start=0,
@@ -508,9 +691,28 @@ if __name__ == '__main__':
                                     labels=labels_noCT,
                                     colors=colors_noCT)
 
+    condon()
+
+    # Read in the most "restrictive" set of snapshot numbers; this
+    # will let us compare sets of equal size.
+    snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_3qm")
+    filter_snapshots(snapnums, snapnums_frequencies_d, frequencies_CO2_d)
+
+    do_result_convergence_plots(frequencies_CO2_d,
+                                name='frequency_same_set',
+                                n_qm_start=0,
+                                n_qm_end=3,
+                                ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
+                                labels=labels,
+                                colors=colors)
+    do_result_convergence_plots_gaps(frequencies_CO2_d,
+                                     name='frequency_same_set',
+                                     func_to_apply=lambda x: x,
+                                     ylabel=r'$\nu_{3}$ frequency (cm$^{-1}$)',
+                                     symbol='\omega')
+
     if args.do_snapshot_plots:
 
-        snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_3qm")
         print('snapshot numbers:', snapnums)
         for snapnum in snapnums:
             plot_single_snapshot_results(snapnum,
@@ -554,103 +756,3 @@ if __name__ == '__main__':
                                                  symbol='\mu')
 
     ###################################
-
-    # testing whether or not the Condon approximation is appropriate
-
-    fig, ax = plt.subplots()
-
-    frequencies_all = []
-    intensities_all = []
-
-    csvfile = open('{}/condon_analysis_linear_regression.csv'.format(args.analysis_dir), 'w')
-    csvwriter = csv.writer(csvfile)
-    csvwriter.writerow([
-        '# QM',
-        '# MM',
-        '# points',
-        'slope',
-        'intercept',
-        'rsq',
-    ])
-
-    for n_qm in sorted(frequencies_CO2_d):
-        print("Forming Condon approximation plot for {}".format(labels[n_qm]))
-        frequencies_single_qm_all_mm = []
-        intensities_single_qm_all_mm = []
-        for n_mm in possible_keys:
-            f = frequencies_CO2_d[n_qm][n_mm]
-            i = intensities_CO2_d[n_qm][n_mm]
-            assert len(f) == len(i)
-            frequencies_single_qm_all_mm.extend(f)
-            intensities_single_qm_all_mm.extend(i)
-            frequencies_all.extend(f)
-            intensities_all.extend(i)
-            print('{} QM/{} MM'.format(n_qm, n_mm))
-            slope, intercept, rsq = pprint_linregress(f, i)
-            csvwriter.writerow([n_qm, n_mm, len(f), slope, intercept, rsq])
-        assert len(frequencies_single_qm_all_mm) == len(intensities_single_qm_all_mm)
-        ax.scatter(frequencies_single_qm_all_mm,
-                   intensities_single_qm_all_mm,
-                   marker=markers[n_qm],
-                   label=labels[n_qm],
-                   color=colors[n_qm])
-        print('{} QM/all MM'.format(n_qm))
-        slope, intercept, rsq = pprint_linregress(frequencies_single_qm_all_mm,
-                                                  intensities_single_qm_all_mm)
-        csvwriter.writerow([n_qm, 'all', len(frequencies_single_qm_all_mm), slope, intercept, rsq])
-
-    assert len(frequencies_all) == len(intensities_all)
-    print('all QM/all MM')
-    slope, intercept, rsq = pprint_linregress(frequencies_all, intensities_all)
-    csvwriter.writerow(['all', 'all', len(frequencies_all), slope, intercept, rsq])
-
-    ax.set_ylim((0.0, 1000.0))
-    y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
-    ax.yaxis.set_major_formatter(y_formatter)
-    ax.tick_params(direction='out', top='off', right='off')
-    ax.set_xlabel(r"$\nu_{3}$ frequency (cm$^{-1}$)")
-    ax.set_ylabel(r"$\nu_{3}$ intensity (km/mol)")
-    ax.set_title("Condon approximation")
-    ax.legend(loc='lower right',
-              fancybox=True,
-              framealpha=0.50,
-              numpoints=1,
-              scatterpoints=1)
-    if args.do_condon_plots:
-        fig.savefig('{}/condon_approximation.pdf'.format(args.analysis_dir), bbox_inches='tight')
-
-    # now add the no CT data
-
-    if args.include_noCT:
-        for n_qm in sorted(frequencies_noCT_CO2_d):
-            frequencies_single_qm_all_mm = []
-            intensities_single_qm_all_mm = []
-            for n_mm in possible_keys:
-                f = frequencies_noCT_CO2_d[n_qm][n_mm]
-                i = intensities_noCT_CO2_d[n_qm][n_mm]
-                assert len(f) == len(i)
-                frequencies_single_qm_all_mm.extend(f)
-                intensities_single_qm_all_mm.extend(i)
-                frequencies_all.extend(f)
-                intensities_all.extend(i)
-                print('{} QM/{} MM'.format(n_qm, n_mm))
-            assert len(frequencies_single_qm_all_mm) == len(intensities_single_qm_all_mm)
-            ax.scatter(frequencies_single_qm_all_mm,
-                       intensities_single_qm_all_mm,
-                       marker=markers_noCT[n_qm],
-                       label=labels_noCT[n_qm],
-                       color=colors_noCT[n_qm])
-            print('{} QM/all MM'.format(n_qm))
-
-        ax.legend(loc='lower right',
-                  fancybox=True,
-                  framealpha=0.50,
-                  numpoints=1,
-                  scatterpoints=1)
-
-        if args.do_condon_plots:
-            fig.savefig('{}/condon_approximation_noCT.pdf'.format(args.analysis_dir), bbox_inches='tight')
-
-    csvfile.close()
-
-    plt.close(fig)

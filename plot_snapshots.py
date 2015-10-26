@@ -11,26 +11,6 @@ from analysis_utils import mangle_dict_keys
 from analysis_utils import read_snapshot_file
 
 
-def filter_snapshots(desired_snapshot_numbers, snapnums_d, results_d):
-
-    assert snapnums_d.keys() == results_d.keys()
-    for n_qm in snapnums_d:
-        assert snapnums_d[n_qm].keys() == results_d[n_qm].keys()
-        for n_mm in snapnums_d[n_qm]:
-            snapnums = snapnums_d[n_qm][n_mm]
-            if len(snapnums) > 0:
-                results = results_d[n_qm][n_mm]
-                indices = [i for i, x in enumerate(snapnums)
-                           if x in desired_snapshot_numbers]
-                # assert sorted(np.asarray(snapnums)[indices]) == sorted(desired_snapshot_numbers)
-                new_snapnums = np.asarray(snapnums)[indices]
-                new_results = np.asarray(results)[indices]
-                snapnums_d[n_qm][n_mm] = new_snapnums
-                results_d[n_qm][n_mm] = new_results
-
-    return
-
-
 def sort(n_qm, n_mm, snapnums_d, results_d):
 
     z = sorted([(sn, r) for (sn, r) in zip(snapnums_d[n_qm][n_mm],

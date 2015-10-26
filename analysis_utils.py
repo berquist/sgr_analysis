@@ -8,6 +8,7 @@ from __future__ import division
 import os
 import re
 
+import numpy as np
 import scipy.stats as sps
 
 from cclib.parser import ccopen
@@ -282,10 +283,10 @@ def pprint_linregress(x, y):
     """Pretty-print a linear regression between x and y arrays."""
 
     slope, intercept, rval, pval, stderr = sps.linregress(x, y)
-    print(" slope:     {:f}".format(slope))
-    print(" intercept: {:f}".format(intercept))
     rsq = rval**2
-    print(" rval2:     {:f}".format(rsq))
+    print(" slope:     {:f}".format(slope),
+          " intercept: {:f}".format(intercept),
+          " rval2:     {:f}".format(rsq))
 
     return slope, intercept, rsq
 
@@ -303,3 +304,24 @@ def read_snapshot_file(filename):
 
 def filter_outputfiles(l):
     return list(filter(lambda x: '_0mm' in x, l))
+
+
+def filter_snapshots(desired_snapshot_numbers, snapnums_d, results_d):
+
+    assert snapnums_d.keys() == results_d.keys()
+    for n_qm in snapnums_d:
+        assert snapnums_d[n_qm].keys() == results_d[n_qm].keys()
+        for n_mm in snapnums_d[n_qm]:
+            snapnums = snapnums_d[n_qm][n_mm]
+            if len(snapnums) > 0:
+                results = results_d[n_qm][n_mm]
+                indices = [i for i, x in enumerate(snapnums)
+                           if x in desired_snapshot_numbers]
+                # assert sorted(np.asarray(snapnums)[indices]) == sorted(desired_snapshot_numbers)
+                # this is pretty terrible
+                new_snapnums = list(np.asarray(snapnums)[indices])
+                new_results = list(np.asarray(results)[indices])
+                snapnums_d[n_qm][n_mm] = new_snapnums
+                results_d[n_qm][n_mm] = new_results
+
+    return
