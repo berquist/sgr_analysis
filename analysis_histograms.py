@@ -161,6 +161,12 @@ def analysis_single(numbins, n_qm, n_mm):
                  linewidth=3,
                  linestyle='--')
 
+    # Add the experimental BMIM/PF6 frequency as a stick.
+    ax_hist.stem([2340.0],
+                 [ax_hist.get_ylim()[1]],
+                 linefmt='k:',
+                 markerfmt='k:')
+
     ax_hist.legend(fancybox=True, loc='upper right', framealpha=0.50)
     filename = 'hist_{}qm_{}mm_{}.pdf'.format(n_qm, n_mm, numbins)
     fig_hist.savefig(filename, bbox_inches='tight')
@@ -254,6 +260,12 @@ def analysis_all_methods_all_basis_sets(numbins):
                          linewidth=3,
                          linestyle='--')
 
+            # Add the experimental BMIM/PF6 frequency as a stick.
+            ax_hist.stem([2340.0],
+                         [ax_hist.get_ylim()[1]],
+                         linefmt='k:',
+                         markerfmt='k:')
+
             ax_hist.legend(fancybox=True, loc='upper right', framealpha=0.50)
             fig_hist.savefig('hist_{}_{}_{}.pdf'.format(method, basis_set, numbins), bbox_inches='tight')
 
@@ -283,9 +295,8 @@ def analysis_all_methods_all_basis_sets(numbins):
         plt.close(fig)
 
         # Add the experimental BMIM/PF6 frequency as a stick.
-        # Is there a way to avoid hard-coding the "intensity" and have
-        # it determined automatically?
-        ax_combined_hists.stem([2340.0], [0.004],
+        ax_combined_hists.stem([2340.0],
+                               [ax_combined_hists.get_ylim()[1]],
                                linefmt='k:',
                                markerfmt='k:')
 
