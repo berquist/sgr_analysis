@@ -11,11 +11,11 @@ from analysis_utils import mangle_dict_keys
 from analysis_utils import read_snapshot_file
 
 
-def sort(n_qm, n_mm, snapnums_d, results_d):
+def sort(n_qm, n_mm, snapnums_d, results_d, filtered_snapnums):
 
     z = sorted([(sn, r) for (sn, r) in zip(snapnums_d[n_qm][n_mm],
                                            results_d[n_qm][n_mm])
-                 if sn in snapnums])
+                 if sn in filtered_snapnums])
 
     z_sn, z_r = [p[0] for p in z], [p[1] for p in z]
 
@@ -45,10 +45,10 @@ if __name__ == "__main__":
 
     snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_3qm")
 
-    z3_sn, z3_f = sort(3, 0, snapnums_frequencies_d, frequencies_CO2_d)
-    z2_sn, z2_f = sort(2, 0, snapnums_frequencies_d, frequencies_CO2_d)
-    z1_sn, z1_f = sort(1, 0, snapnums_frequencies_d, frequencies_CO2_d)
-    z0_sn, z0_f = sort(0, 0, snapnums_frequencies_d, frequencies_CO2_d)
+    z3_sn, z3_f = sort(3, 0, snapnums_frequencies_d, frequencies_CO2_d, snapnums)
+    z2_sn, z2_f = sort(2, 0, snapnums_frequencies_d, frequencies_CO2_d, snapnums)
+    z1_sn, z1_f = sort(1, 0, snapnums_frequencies_d, frequencies_CO2_d, snapnums)
+    z0_sn, z0_f = sort(0, 0, snapnums_frequencies_d, frequencies_CO2_d, snapnums)
 
     print("np.mean(z0_f): {:7.2f} len_f: {:4d} len_sn: {:4d}".format(np.mean(z0_f), len(z0_f), len(z0_sn)))
     print("np.mean(z1_f): {:7.2f} len_f: {:4d} len_sn: {:4d}".format(np.mean(z1_f), len(z1_f), len(z1_sn)))

@@ -1,0 +1,21 @@
+# -*- mode: makefile; -*-
+
+ANALYSIS_DIR=../analysis
+
+parse:
+	# python ${ANALYSIS_DIR}/parse_outputs_snapshot_method_dependence.py save save
+	python ${ANALYSIS_DIR}/parse_outputs.py save save --parse-frequencies --parse-dipoles --parse-gradients --parse-geometries
+
+analysis:
+	python ${ANALYSIS_DIR}/clyde_histograms.py
+	python ${ANALYSIS_DIR}/analysis_histograms.py single --numbins=5 --n_qm=0 --n_mm=0
+	# python ${ANALYSIS_DIR}/pick_snapshots.py --sample-method=b3lyp --sample-basis-set=6-311++gdp --numbins=5
+	# python ${ANALYSIS_DIR}/analysis_snapshot_method_dependence.py
+	python ${ANALYSIS_DIR}/analysis_geometries.py --csv
+	python ${ANALYSIS_DIR}/plot_modes.py
+	python ${ANALYSIS_DIR}/plot_stretches.py
+
+generate:
+	mkdir -p stretch_1 && cd stretch_1 && python ../${ANALYSIS_DIR}/generate_steps.py stretch_1 --stepsize=0.005 --stepmin=-0.5 --stepmax=5.0
+	mkdir -p stretch_2 && cd stretch_2 && python ../${ANALYSIS_DIR}/generate_steps.py stretch_2 --stepsize=0.005 --stepmin=-0.5 --stepmax=5.0
+	mkdir -p bend && cd bend && python ../${ANALYSIS_DIR}/generate_steps.py bend  --stepsize=0.0025 --stepmin=-0.0025 --stepmax=0.2

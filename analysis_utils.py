@@ -121,9 +121,66 @@ def get_dipoles(outputfilenames):
     return dipoles, snapnums
 
 
+def get_gradients(outputfilenames):
+    """This currently doesn't work for correlated calculations, just SCF
+    ones!
+    """
+
+    gradients_rms = []
+    gradients_max = []
+    snapnums = []
+
+    for outputfilename in outputfilenames:
+        with open(outputfilename) as outputfile:
+            print("Parsing gradient from {}".format(outputfilename))
+            for line in outputfile:
+                if 'Max gradient component' in line:
+                    gradient_max = float(line.split()[-1])
+                    line = next(outputfile)
+                    assert 'RMS gradient' in line
+                    gradient_rms = float(line.split()[-1])
+                    gradients_rms.append(gradient_rms)
+                    gradients_max.append(gradient_max)
+                    snapnum = int(re.search(r'drop_(\d+)_', outputfilename).groups()[0])
+                    snapnums.append(snapnum)
+                    # Only take the first one! This avoids problems
+                    # when parsing numerical frequency runs, where the
+                    # gradient appears every finite difference step.
+                    break
+
+    return gradients_rms, gradients_max, snapnums
+
+
 def get_dipoles_supersystem(outputfilenames):
 
     pass
+
+
+def get_geometries(outputfilenames):
+
+    snapnums = []
+    CO2_geometries = []
+
+    for outputfilename in outputfilenames:
+        print("Parsing CO2 geometry from {}".format(outputfilename))
+
+        job = ccopen(outputfilename)
+        try:
+            data = job.parse()
+        except:
+            # Is this the right control flow statement?
+            continue
+        # take the first one on the off chance that we've done a
+        # numerical frequency run, which looks a lot like a geometry
+        # optimization
+        geometry_whole = data.atomcoords[0]
+        start_index = len(data.atomnos) - 3
+        geometry_CO2 = geometry_whole[start_index:]
+        CO2_geometries.append(geometry_CO2)
+        snapnum = int(re.search(r'drop_(\d+)_', outputfilename).groups()[0])
+        snapnums.append(snapnum)
+
+    return CO2_geometries, snapnums
 
 
 def mangle_dict_keys(d):
@@ -190,6 +247,34 @@ def get_dipoles_d(filename_dict):
             dipoles_dict[n_mm], snapnums_dict[n_mm] = get_dipoles(filename_dict[n_mm])
 
     return dipoles_dict, snapnums_dict
+
+
+def get_gradients_d(filename_dict):
+    """"""
+
+    gradients_rms_dict = make_n_mm_dict()
+    gradients_max_dict = make_n_mm_dict()
+    snapnums_dict = make_n_mm_dict()
+
+    for n_mm in filename_dict:
+        if len(filename_dict[n_mm]) > 0:
+            gradients_rms_dict[n_mm], gradients_max_dict[n_mm], snapnums_dict[n_mm] = get_gradients(filename_dict[n_mm])
+
+
+    return gradients_rms_dict, gradients_max_dict, snapnums_dict
+
+
+def get_geometries_d(filename_dict):
+    """"""
+
+    geometries_dict = make_n_mm_dict()
+    snapnums_dict = make_n_mm_dict()
+
+    for n_mm in filename_dict:
+        if len(filename_dict[n_mm]) > 0:
+            geometries_dict[n_mm], snapnums_dict[n_mm] = get_geometries(filename_dict[n_mm])
+
+    return geometries_dict, snapnums_dict
 
 
 def get_single_snapshot_results(snapnum, snapnums_dict, results_dict):
