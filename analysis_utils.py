@@ -20,6 +20,20 @@ def slice(x, start, end):
     return x >= start and x < end
 
 
+def pad_left_zeros(num, maxwidth):
+    """Pad the given number with zeros on the left until the
+    total length is maxwidth, returning it as a string.
+    """
+
+    numwidth = len(str(num))
+    if numwidth < maxwidth:
+        numzeros = maxwidth - numwidth
+        numstr = (numzeros * '0') + str(num)
+    else:
+        numstr = str(num)
+    return numstr
+
+
 def make_n_mm_dict():
     """So we can avoid having to check every loop iteration later on. Make
     all possible keys even if we won't use the bigger values.

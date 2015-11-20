@@ -8,21 +8,10 @@ from glob import glob
 
 from cclib.parser import ccopen
 
-from model_hamiltonian_frequencies import (distance, bond_angle)
+from model_hamiltonian_frequencies import \
+    (distance, bond_angle)
+from analysis_utils import pad_left_zeros
 
-
-def pad_left_zeros(num, maxwidth):
-    """Pad the given number with zeros on the left until the
-    total length is maxwidth, returning it as a string.
-    """
-
-    numwidth = len(str(num))
-    if numwidth < maxwidth:
-        numzeros = maxwidth - numwidth
-        numstr = (numzeros * '0') + str(num)
-    else:
-        numstr = str(num)
-    return numstr
 
 
 def rename_step_files_clyde(filenames):
@@ -113,8 +102,8 @@ if __name__ == "__main__":
         l12 = bond_sum
         dl = bond_difference
 
-        geometry_params['l1'].append(l12)
-        geometry_params['l2'].append(l12)
+        geometry_params['l1'].append(l1)
+        geometry_params['l2'].append(l2)
         geometry_params['l12'].append(l12)
 
     import matplotlib as mpl

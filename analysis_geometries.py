@@ -4,6 +4,8 @@ from __future__ import print_function
 
 import pickle
 
+import numpy as np
+
 from scipy.stats import linregress
 
 from analysis_utils import mangle_dict_keys
