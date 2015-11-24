@@ -201,7 +201,7 @@ if __name__ == "__main__":
     ax.set_ylabel(r'harmonic frequency (cm$^{-1}$)')
     ax.legend(loc='best', fancybox=True, framealpha=0.50, fontsize='x-small')
 
-    fig.savefig('stretch_1_l2.pdf', bbox_inches='tight')
+    fig.savefig('scan_stretch_1_l2.pdf', bbox_inches='tight')
 
     fig, ax = plt.subplots()
 
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     ax.set_ylabel(r'harmonic frequency (cm$^{-1}$)')
     ax.legend(loc='best', fancybox=True, framealpha=0.50, fontsize='x-small')
 
-    fig.savefig('stretch_1_l12.pdf', bbox_inches='tight')
+    fig.savefig('scan_stretch_1_l12.pdf', bbox_inches='tight')
 
     fig, ax = plt.subplots()
 
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     ax.set_ylabel(r'harmonic frequency (cm$^{-1}$)')
     ax.legend(loc='best', fancybox=True, framealpha=0.50, fontsize='x-small')
 
-    fig.savefig('stretch_2_l12.pdf', bbox_inches='tight')
+    fig.savefig('scan_stretch_2_l12.pdf', bbox_inches='tight')
 
     fig, ax = plt.subplots()
 
@@ -246,4 +246,4 @@ if __name__ == "__main__":
     ax.set_ylabel(r'harmonic frequency (cm$^{-1}$)')
     ax.legend(loc='best', fancybox=True, framealpha=0.50, fontsize='x-small')
 
-    fig.savefig('bend_theta.pdf', bbox_inches='tight')
+    fig.savefig('scan_bend_theta.pdf', bbox_inches='tight')
