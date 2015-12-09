@@ -18,6 +18,7 @@ from parse_outputs_snapshot_method_dependence import basis_sets
 import matplotlib as mpl
 mpl.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 
 colors = OrderedDict([
@@ -262,13 +263,18 @@ if __name__ == '__main__':
     ticks_traj = list(range(0, (cutoff + step), step))
     ticks_traj[0] = 1
 
+    cmap = cm.get_cmap('viridis')
+
     fig, ax = plt.subplots()
 
     # one series for each method used
-    for method in methods:
+    num_plot_lines = len(methods)
+    for idx, method in enumerate(methods):
+        c = cmap(float(idx) / (num_plot_lines - 1))
         ax.plot(frequencies[method]['6-31gdp'][0][0][:cutoff],
                 label=methods[method],
-                linewidth=1)
+                linewidth=1,
+                color=c)
 
     # Add the experimental BMIM/PF6 frequency as a line.
     ax.plot(ax.get_xlim(),

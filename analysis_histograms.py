@@ -17,6 +17,7 @@ from analysis_snapshot_method_dependence import \
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 
 # These are the total number of snapshots we want to sample for
@@ -64,7 +65,7 @@ def bin_snapshots(frequencies, snapnums, numbins, center, binwidth):
     for binidx in range(1, numbins + 1):
         mask = np.where(bin_indices == binidx)[0]
         masked_snapnums = snapnums[mask]
-        masked_frequencies = frequencies[mask]
+        # masked_frequencies = frequencies[mask]
         binned_snapshots.append(masked_snapnums)
 
     return binned_snapshots
@@ -107,7 +108,7 @@ def analysis_single(numbins, n_qm, n_mm):
                        frequencies_d[n_qm][n_mm]),
                    key=lambda x: x[1])
     print(pairs)
-    snapnums = [x[0] for x in pairs]
+    # snapnums = [x[0] for x in pairs]
     frequencies = [x[1] for x in pairs]
 
     mmin = min(frequencies)
@@ -192,13 +193,17 @@ def analysis_all_methods_all_basis_sets(numbins):
     fig, ax = plt.subplots()
     fig_combined_hists, ax_combined_hists = plt.subplots()
 
+    cmap = cm.get_cmap('viridis')
+
+    num_plot_lines = len(methods)
+
     for basis_set in basis_sets:
-        for method in methods:
+        for idx, method in enumerate(methods):
 
             pairs = sorted(zip(snapnums_d[method][basis_set][0][0],
                                frequencies_d[method][basis_set][0][0]),
                            key=lambda x: x[1])
-            snapnums = [x[0] for x in pairs]
+            # snapnums = [x[0] for x in pairs]
             frequencies = [x[1] for x in pairs]
 
             mmin = min(frequencies)
@@ -254,6 +259,7 @@ def analysis_all_methods_all_basis_sets(numbins):
             pdf_all = norm_pdf(linspace_all, mu=center, sigma=binwidth)
             print('sum(pdf_bins): {}'.format(sum(pdf_bins)))
             print('sum(pdf_all) : {}'.format(sum(pdf_all)))
+
             ax_hist.plot(linspace_bins,
                          pdf_bins,
                          label='probability density function',
@@ -276,15 +282,19 @@ def analysis_all_methods_all_basis_sets(numbins):
             # NumPy and matplotlib are doing the same thing for the bins.
             assert bin_edges.all() == bins_mpl.all()
 
+            c = cmap(float(idx) / (num_plot_lines - 1))
+
             ax.plot(frequencies,
                     label='{}/{}'.format(methods[method], basis_sets[basis_set]),
-                    color=colors[method],
+                    # color=colors[method],
+                    color=c,
                     linestyle=linestyles[basis_set])
 
             ax_combined_hists.plot(linspace_bins,
                                    pdf_bins,
                                    label='{}/{}'.format(methods[method], basis_sets[basis_set]),
-                                   color=colors[method],
+                                   # color=colors[method],
+                                   color=c,
                                    linestyle=linestyles[basis_set])
 
         # Add the experimental BMIM/PF6 frequency as a line.
