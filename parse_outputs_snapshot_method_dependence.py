@@ -23,7 +23,7 @@ methods = OrderedDict([
 ])
 
 basis_sets = OrderedDict([
-    ('6-31gdp', '6-31G**'),
+    ('6-31gdp', '6-31G(d,p)'),
     ('cc-pvtz', 'cc-pVTZ'),
 ])
 
