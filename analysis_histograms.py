@@ -287,6 +287,20 @@ def analysis_all_methods_all_basis_sets(numbins):
                                    color=colors[method],
                                    linestyle=linestyles[basis_set])
 
+        # Add the experimental BMIM/PF6 frequency as a line.
+        ax.plot(ax.get_xlim(),
+                [2340.0, 2340.0],
+                marker='',
+                linestyle=':',
+                color='black',
+                label='experiment')
+
+        # Having the snapshot number start at 0 looks bad and doesn't
+        # make sense.
+        xticks = ax.get_xticks()
+        xticks[0] = 1
+        ax.set_xticks(xticks)
+
         ax.legend(fancybox=True,
                   loc='best',
                   framealpha=0.50,
@@ -301,12 +315,6 @@ def analysis_all_methods_all_basis_sets(numbins):
         plt.close(fig)
 
         # Add the experimental BMIM/PF6 frequency as a line.
-        ax.plot(ax.get_xlim(),
-                [2340.0, 2340.0],
-                marker='',
-                linestyle=':',
-                color='black',
-                label='experiment')
         ax_combined_hists.plot([2340.0, 2340.0],
                                ax_combined_hists.get_ylim(),
                                marker='',
