@@ -85,7 +85,7 @@ def extract(filenames, equilibrium_length=None):
             d_O1_O2 = distance(geometry[O1], geometry[O2])
 
             bond_sum = d_C_O1 + d_C_O2
-            bond_difference = abs(d_C_O1 - d_C_O2)
+            # bond_difference = abs(d_C_O1 - d_C_O2)
 
             angle = bond_angle(geometry[O1], geometry[C], geometry[O2])
             theta = 180.0 - angle
@@ -94,7 +94,7 @@ def extract(filenames, equilibrium_length=None):
             l2 = d_C_O2
             o12 = d_O1_O2
             l12 = bond_sum
-            dl = bond_difference
+            # dl = bond_difference
 
             if equilibrium_length:
                 l1_diff = l1 - equilibrium_length

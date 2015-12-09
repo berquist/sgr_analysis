@@ -100,19 +100,24 @@ if __name__ == '__main__':
 
     if args.kind == 'stretch_1':
         for count, step in enumerate(steps, start=1):
-            input_file_contents = qchem_template(start, -start + step)
+            input_file_contents = qchem_template(start,
+                                                 -start + step,
+                                                 mult=args.mult)
             with open('step_{}.in'.format(count), 'w') as input_file:
                 input_file.write(input_file_contents)
     elif args.kind == 'stretch_2':
         for count, step in enumerate(steps, start=1):
-            input_file_contents = qchem_template(start - step, -start + step)
+            input_file_contents = qchem_template(start - step,
+                                                 -start + step,
+                                                 mult=args.mult)
             with open('step_{}.in'.format(count), 'w') as input_file:
                 input_file.write(input_file_contents)
     elif args.kind == 'bend':
         for count, step in enumerate(steps, start=1):
             input_file_contents = qchem_template(coord_O1=start,
-                                           coord_O2=-start,
-                                           coord_C=0.0 + step)
+                                                 coord_O2=-start,
+                                                 coord_C=0.0 + step,
+                                                 mult=args.mult)
             with open('step_{}.in'.format(count), 'w') as input_file:
                 input_file.write(input_file_contents)
     else:
