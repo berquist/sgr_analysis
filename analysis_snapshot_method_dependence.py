@@ -162,7 +162,7 @@ if __name__ == '__main__':
 
     ##################################################
 
-    # Plot the mean frequencies for each method using the 6-31G**
+    # Plot the mean frequencies for each method using the 6-31G(d,p)
     # basis set over the 0,0 snapshots.
 
     fig, ax = plt.subplots()
@@ -181,7 +181,7 @@ if __name__ == '__main__':
 
     ##################################################
 
-    # Plot the mean dipole moments for each method using the 6-31G**
+    # Plot the mean dipole moments for each method using the 6-31G(d,p)
     # basis set over the 0,0 snapshots.
 
     fig, ax = plt.subplots()
@@ -202,7 +202,7 @@ if __name__ == '__main__':
 
     # Plot the mean frequencies (increasing scale) and mean dipole
     # moments (decreasing scale) together for each method using the
-    # 6-31G** basis set over the 0,0 snapshots.
+    # 6-31G(d,p) basis set over the 0,0 snapshots.
 
     ax1_color = 'blue'
     ax2_color = 'green'
@@ -267,14 +267,26 @@ if __name__ == '__main__':
     # one series for each method used
     for method in methods:
         ax.plot(frequencies[method]['6-31gdp'][0][0][:cutoff],
-                label=methods[method])
+                label=methods[method],
+                linewidth=1)
+
+    # Add the experimental BMIM/PF6 frequency as a line.
+    ax.plot(ax.get_xlim(),
+            [2340.0, 2340.0],
+            marker='',
+            linestyle=':',
+            color='black',
+            label='experiment')
 
     ax.set_xticks(ticks_traj)
     ax.set_xlim((min(ticks_traj), max(ticks_traj)))
     ax.set_xlabel('snapshot #', fontsize='large')
-    ax.set_ylabel(r'$\nu_{3}$ frequency (cm$^{-1}$)', fontsize='large')
-    ax.tick_params(direction='out', top='off', right='off')
-    ax.legend(fancybox=True, loc='upper right', framealpha=0.50)
+    ax.set_ylabel(r'$\nu_{3}$ harmonic frequency (cm$^{-1}$)', fontsize='large')
+    ax.tick_params(direction='out')
+    ax.legend(fancybox=True,
+              loc='upper right',
+              framealpha=0.50,
+              fontsize='small')
 
     filename = 'trajectory_frequencies_6-31gdp.pdf'
     print('Saving {}'.format(filename))
