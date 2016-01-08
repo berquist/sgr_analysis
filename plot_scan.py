@@ -148,9 +148,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    directory_stretch_1 = "/home/eric/Chemistry/calc.sgr/droplets/clyde_histogram/stretch_1"
-    directory_stretch_2 = "/home/eric/Chemistry/calc.sgr/droplets/clyde_histogram/stretch_2"
-    directory_bend = "/home/eric/Chemistry/calc.sgr/droplets/clyde_histogram/bend"
+    directory_parent = "/home/eric/Chemistry/calc.sgr/droplets/scan/scan_restricted"
+    directory_stretch_1 = os.path.join(directory_parent, "scan_stretch_1_6-311++gdp")
+    directory_stretch_2 = os.path.join(directory_parent, "scan_stretch_2_6-311++gdp")
+    directory_bend = os.path.join(directory_parent, "scan_bend_6-311++gdp")
 
     filenames_stretch_1 = glob(os.path.join(directory_stretch_1, "step*"))
     filenames_stretch_2 = glob(os.path.join(directory_stretch_2, "step*"))
