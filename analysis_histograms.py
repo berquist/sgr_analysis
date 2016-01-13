@@ -172,6 +172,7 @@ def analysis_single(numbins, n_qm, n_mm):
     ax_hist.legend(fancybox=True, loc='upper right', framealpha=0.50)
     filename = 'hist_{}qm_{}mm_{}.pdf'.format(n_qm, n_mm, numbins)
     fig_hist.savefig(filename, bbox_inches='tight')
+    print('Saving {}'.format(filename))
 
     plt.close(fig_hist)
 
@@ -275,7 +276,9 @@ def analysis_all_methods_all_basis_sets(numbins):
                          label='experiment')
 
             ax_hist.legend(fancybox=True, loc='upper right', framealpha=0.50)
-            fig_hist.savefig('hist_{}_{}_{}.pdf'.format(method, basis_set, numbins), bbox_inches='tight')
+            filename = 'hist_{}_{}_{}.pdf'.format(method, basis_set, numbins)
+            fig_hist.savefig(filename, bbox_inches='tight')
+            print('Saving {}'.format(filename))
 
             plt.close(fig_hist)
 
@@ -307,20 +310,25 @@ def analysis_all_methods_all_basis_sets(numbins):
 
     # Having the snapshot number start at 0 looks bad and doesn't
     # make sense.
-    xticks = ax.get_xticks()
-    xticks[0] = 1
-    ax.set_xticks(xticks)
+    # xticks = ax.get_xticks()
+    # xticks[0] = 1
+    # ax.set_xticks(xticks)
+    ax.set_xticklabels([])
 
     ax.legend(fancybox=True,
               loc='best',
               framealpha=0.50,
               fontsize='small')
-    ax.set_xlabel('snapshot #',
-                  fontsize='large')
+    # ax.set_xlabel('snapshot #',
+    #               fontsize='large')
     ax.set_ylabel(r'$\nu_3$ harmonic frequency (cm$^{-1}$)',
                   fontsize='large')
-    ax.tick_params(direction='out')
-    fig.savefig('snapshots_ordered.pdf', bbox_inches='tight')
+    ax.tick_params(direction='out',
+                   top='off',
+                   bottom='off')
+    filename = 'snapshots_ordered.pdf'
+    fig.savefig(filename, bbox_inches='tight')
+    print('Saving {}'.format(filename))
 
     plt.close(fig)
 
@@ -342,7 +350,9 @@ def analysis_all_methods_all_basis_sets(numbins):
                                  fontsize='large')
     ax_combined_hists.set_title('probability density functions')
     ax.tick_params(direction='out')
-    fig_combined_hists.savefig('combined_pdfs.pdf', bbox_inches='tight')
+    filename = 'combined_pdfs.pdf'
+    fig_combined_hists.savefig(filename, bbox_inches='tight')
+    print('Saving {}'.format(filename))
 
     plt.close(fig_combined_hists)
 
