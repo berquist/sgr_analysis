@@ -59,6 +59,7 @@ def filter_n_mm_into_dict(outputfilenames):
         try:
             n_mm = int(re.search(r'_(\d+)mm', outputfilename).groups()[0])
         # Due to a silly shell mishap: `rename _0 _ ./*` is a bad idea, kids.
+        # Actually, this is very useful, if the filename doesn't have # MM pairs in it at all.
         except AttributeError:
             n_mm = 0
         d[n_mm].append(outputfilename)
@@ -105,7 +106,53 @@ def get_CO2_frequencies(outputfilenames):
         # print(outputfilename)
         CO2_frequencies.append(vibfreqs[mode_indices[-1]])
         CO2_intensities.append(vibirs[mode_indices[-1]])
-        snapnum = int(re.search(r'drop_(\d+)_', outputfilename).groups()[0])
+        snapnum = int(re.search(r'drop_(\d+)', outputfilename).groups()[0])
+        snapnums.append(snapnum)
+
+    return CO2_frequencies, CO2_intensities, snapnums
+
+
+def get_CO2_frequencies_4fs(outputfilenames):
+    """The same as above, but for the snapshots separated by 4fs."""
+
+    snapnums = []
+    CO2_frequencies = []
+    CO2_intensities = []
+
+    for outputfilename in outputfilenames:
+        print("Parsing frequencies from {}".format(outputfilename))
+
+        job = ccopen(outputfilename)
+        try:
+            data = job.parse()
+        except:
+            # Is this the right control flow statement?
+            continue
+        # geometry = data.atomcoords[-1]
+        # atoms = data.atomnos
+        # start_indices = find_CO2_atom_indices(atoms, geometry)
+        # assert isinstance(start_indices, list)
+        try:
+            vibfreqs = data.vibfreqs
+            vibdisps = data.vibdisps
+            vibirs = data.vibirs
+        except AttributeError:
+            # Is this the correct control flow statement?
+            continue
+        # Assumption!
+        # start_index = start_indices[0]
+        # Assumption?
+        start_index = 0
+        mode_indices = find_CO2_mode_indices(start_index, vibdisps, thresh=0.50)
+        # mode_indices = [2]
+        # freqs = [vibfreqs[modeidx] for modeidx in mode_indices]
+        # freqs = filter(lambda x: x > 0.0, freqs)
+        # print(freqs)
+        # Let's only take the last one...
+        # print(outputfilename)
+        CO2_frequencies.append(vibfreqs[mode_indices[-1]])
+        CO2_intensities.append(vibirs[mode_indices[-1]])
+        snapnum = int(re.search(r'drop_(\d+)', outputfilename).groups()[0])
         snapnums.append(snapnum)
 
     return CO2_frequencies, CO2_intensities, snapnums
@@ -125,7 +172,7 @@ def get_dipoles(outputfilenames):
                     line = next(outputfile)
                     dipole = list(map(float, line.split()[1::2]))
                     dipoles.append(dipole)
-                    snapnum = int(re.search(r'drop_(\d+)_', outputfilename).groups()[0])
+                    snapnum = int(re.search(r'drop_(\d+)', outputfilename).groups()[0])
                     snapnums.append(snapnum)
                     # Only take the first one! This avoids problems
                     # when parsing numerical frequency runs, where the
@@ -155,7 +202,7 @@ def get_gradients(outputfilenames):
                     gradient_rms = float(line.split()[-1])
                     gradients_rms.append(gradient_rms)
                     gradients_max.append(gradient_max)
-                    snapnum = int(re.search(r'drop_(\d+)_', outputfilename).groups()[0])
+                    snapnum = int(re.search(r'drop_(\d+)', outputfilename).groups()[0])
                     snapnums.append(snapnum)
                     # Only take the first one! This avoids problems
                     # when parsing numerical frequency runs, where the
@@ -191,7 +238,7 @@ def get_geometries(outputfilenames):
         start_index = len(data.atomnos) - 3
         geometry_CO2 = geometry_whole[start_index:]
         CO2_geometries.append(geometry_CO2)
-        snapnum = int(re.search(r'drop_(\d+)_', outputfilename).groups()[0])
+        snapnum = int(re.search(r'drop_(\d+)', outputfilename).groups()[0])
         snapnums.append(snapnum)
 
     return CO2_geometries, snapnums
@@ -224,7 +271,7 @@ def mangle_dict_keys(d):
     return nd
 
 
-def get_CO2_frequencies_d(filename_dict):
+def get_CO2_frequencies_d(filename_dict, do_4fs=False):
     """The filename dictionary passed as an argument should correspond to
     only 1 # of QM pairs; that is, it's a single-layered dictionary
     where the keys are the # of MM pairs, and the values are lists of
@@ -237,9 +284,14 @@ def get_CO2_frequencies_d(filename_dict):
     intensities_dict = make_n_mm_dict()
     snapnums_dict = make_n_mm_dict()
 
+    if do_4fs:
+        f = get_CO2_frequencies_4fs
+    else:
+        f = get_CO2_frequencies
+
     for n_mm in filename_dict:
         if len(filename_dict[n_mm]) > 0:
-            frequencies_dict[n_mm], intensities_dict[n_mm], snapnums_dict[n_mm] = get_CO2_frequencies(filename_dict[n_mm])
+            frequencies_dict[n_mm], intensities_dict[n_mm], snapnums_dict[n_mm] = f(filename_dict[n_mm])
 
     return frequencies_dict, intensities_dict, snapnums_dict
 
