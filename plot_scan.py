@@ -140,6 +140,10 @@ def make_numpy_array_from_ragged_list(l, fill_value=np.nan):
 
 if __name__ == "__main__":
 
+    import matplotlib as mpl
+    mpl.use("Agg")
+    import matplotlib.pyplot as plt
+
     import argparse
 
     parser = argparse.ArgumentParser()
@@ -148,48 +152,113 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    directory_parent = "/home/eric/Chemistry/calc.sgr/droplets/scan/scan_restricted"
-    directory_stretch_1 = os.path.join(directory_parent, "scan_stretch_1_6-311++gdp")
-    directory_stretch_2 = os.path.join(directory_parent, "scan_stretch_2_6-311++gdp")
-    directory_bend = os.path.join(directory_parent, "scan_bend_6-311++gdp")
+    directory_parent = "/home/eric/Chemistry/calc.sgr/droplets/scan"
+    directory_stretch_1_r = os.path.join(directory_parent, "scan_restricted/scan_stretch_1_6-311++gdp")
+    directory_stretch_2_r = os.path.join(directory_parent, "scan_restricted/scan_stretch_2_6-311++gdp")
+    directory_bend_r = os.path.join(directory_parent, "scan_unrestricted/scan_bend_6-311++gdp")
+    directory_stretch_1_u_s = os.path.join(directory_parent, "scan_unrestricted/scan_stretch_1_6-311++gdp")
+    directory_stretch_2_u_s = os.path.join(directory_parent, "scan_unrestricted/scan_stretch_2_6-311++gdp")
+    directory_bend_u_s = os.path.join(directory_parent, "scan_unrestricted/scan_bend_6-311++gdp")
+    directory_stretch_1_u_t = os.path.join(directory_parent, "scan_unrestricted/scan_stretch_1_6-311++gdp")
+    directory_stretch_2_u_t = os.path.join(directory_parent, "scan_unrestricted/scan_stretch_2_6-311++gdp")
+    directory_bend_u_t = os.path.join(directory_parent, "scan_unrestricted/scan_bend_6-311++gdp")
 
-    filenames_stretch_1 = glob(os.path.join(directory_stretch_1, "step*"))
-    filenames_stretch_2 = glob(os.path.join(directory_stretch_2, "step*"))
-    filenames_bend = glob(os.path.join(directory_bend, "step*"))
-    # rename_step_files_eric(filenames_stretch_1)
-    # rename_step_files_eric(filenames_stretch_2)
-    # rename_step_files_eric(filenames_bend)
+    filenames_stretch_1_r = glob(os.path.join(directory_stretch_1_r, "step*"))
+    filenames_stretch_2_r = glob(os.path.join(directory_stretch_2_r, "step*"))
+    filenames_bend_r = glob(os.path.join(directory_bend_r, "step*"))
+    filenames_stretch_1_u_s = glob(os.path.join(directory_stretch_1_u_s, "step*"))
+    filenames_stretch_2_u_s = glob(os.path.join(directory_stretch_2_u_s, "step*"))
+    filenames_bend_u_s = glob(os.path.join(directory_bend_u_s, "step*"))
+    filenames_stretch_1_u_t = glob(os.path.join(directory_stretch_1_u_t, "step*"))
+    filenames_stretch_2_u_t = glob(os.path.join(directory_stretch_2_u_t, "step*"))
+    filenames_bend_u_t = glob(os.path.join(directory_bend_u_t, "step*"))
+    # rename_step_files_eric(filenames_stretch_1_r)
+    # rename_step_files_eric(filenames_stretch_2_r)
+    # rename_step_files_eric(filenames_bend_r)
 
-    filenames_stretch_1 = sorted(glob(os.path.join(directory_stretch_1, "step_*.out")))
-    filenames_stretch_2 = sorted(glob(os.path.join(directory_stretch_2, "step_*.out")))
-    filenames_bend = sorted(glob(os.path.join(directory_bend, "step_*.out")))
+    filenames_stretch_1_r = sorted(glob(os.path.join(directory_stretch_1_r, "step_*.out")))
+    filenames_stretch_2_r = sorted(glob(os.path.join(directory_stretch_2_r, "step_*.out")))
+    filenames_bend_r = sorted(glob(os.path.join(directory_bend_r, "step_*.out")))
+    filenames_stretch_1_u_s = sorted(glob(os.path.join(directory_stretch_1_u_s, "step_*.out")))
+    filenames_stretch_2_u_s = sorted(glob(os.path.join(directory_stretch_2_u_s, "step_*.out")))
+    filenames_bend_u_s = sorted(glob(os.path.join(directory_bend_u_s, "step_*.out")))
+    filenames_stretch_1_u_t = sorted(glob(os.path.join(directory_stretch_1_u_t, "step_*.out")))
+    filenames_stretch_2_u_t = sorted(glob(os.path.join(directory_stretch_2_u_t, "step_*.out")))
+    filenames_bend_u_t = sorted(glob(os.path.join(directory_bend_u_t, "step_*.out")))
 
-    frequencies_stretch_1, intensities_stretch_1, geometry_params_stretch_1 = extract(filenames_stretch_1,
-                                                                                      args.equilibrium_length)
-    frequencies_stretch_2, intensities_stretch_2, geometry_params_stretch_2 = extract(filenames_stretch_2,
-                                                                                      args.equilibrium_length)
-    frequencies_bend, intensities_bend, geometry_params_bend = extract(filenames_bend,
-                                                                       args.equilibrium_length)
+    print('stretch_1_r')
+    (frequencies_stretch_1_r,
+     intensities_stretch_1_r,
+     geometry_params_stretch_1_r) = extract(filenames_stretch_1_r,
+                                          args.equilibrium_length)
+    print('stretch_2_r')
+    (frequencies_stretch_2_r,
+     intensities_stretch_2_r,
+     geometry_params_stretch_2_r) = extract(filenames_stretch_2_r,
+                                          args.equilibrium_length)
+    print('bend_r')
+    (frequencies_bend_r,
+     intensities_bend_r,
+     geometry_params_bend_r) = extract(filenames_bend_r,
+                                       args.equilibrium_length)
+    print('stretch_1_u_s')
+    (frequencies_stretch_1_u_s,
+     intensities_stretch_1_u_s,
+     geometry_params_stretch_1_u_s) = extract(filenames_stretch_1_u_s,
+                                          args.equilibrium_length)
+    print('stretch_2_u_s')
+    (frequencies_stretch_2_u_s,
+     intensities_stretch_2_u_s,
+     geometry_params_stretch_2_u_s) = extract(filenames_stretch_2_u_s,
+                                          args.equilibrium_length)
+    print('bend_u_s')
+    (frequencies_bend_u_s,
+     intensities_bend_u_s,
+     geometry_params_bend_u_s) = extract(filenames_bend_u_s,
+                                       args.equilibrium_length)
+    print('stretch_1_u_t')
+    (frequencies_stretch_1_u_t,
+     intensities_stretch_1_u_t,
+     geometry_params_stretch_1_u_t) = extract(filenames_stretch_1_u_t,
+                                          args.equilibrium_length)
+    print('stretch_2_u_t')
+    (frequencies_stretch_2_u_t,
+     intensities_stretch_2_u_t,
+     geometry_params_stretch_2_u_t) = extract(filenames_stretch_2_u_t,
+                                          args.equilibrium_length)
+    print('bend_u_t')
+    (frequencies_bend_u_t,
+     intensities_bend_u_t,
+     geometry_params_bend_u_t) = extract(filenames_bend_u_t,
+                                       args.equilibrium_length)
 
     l2_min = 0.75
     l2_max = 2
     l12_min = 2
     l12_max = 4
 
-    mask_1_l2 = np.logical_and(geometry_params_stretch_1['l2'] >= l2_min, geometry_params_stretch_1['l2'] <= l2_max)
-    mask_1_l12 = np.logical_and(geometry_params_stretch_1['l12'] >= l12_min, geometry_params_stretch_1['l12'] <= l12_max)
-    mask_2_l12 = np.logical_and(geometry_params_stretch_2['l12'] >= l12_min, geometry_params_stretch_2['l12'] <= l12_max)
-
-    import matplotlib as mpl
-    mpl.use("Agg")
-    import matplotlib.pyplot as plt
+    # rename the mask variables!
+    mask_1_l2 = np.logical_and(geometry_params_stretch_1_r['l2'] >= l2_min,
+                               geometry_params_stretch_1_r['l2'] <= l2_max)
+    mask_1_l12 = np.logical_and(geometry_params_stretch_1_r['l12'] >= l12_min,
+                                geometry_params_stretch_1_r['l12'] <= l12_max)
+    mask_2_l12 = np.logical_and(geometry_params_stretch_2_r['l12'] >= l12_min,
+                                geometry_params_stretch_2_r['l12'] <= l12_max)
 
     fig, ax = plt.subplots()
 
-    ax.scatter(geometry_params_stretch_1['l2_diff'][mask_1_l2], frequencies_stretch_1[:, 0][mask_1_l2], label='mode 1', linewidth=0.5, marker='o', facecolors='none', edgecolors='blue')
-    ax.scatter(geometry_params_stretch_1['l2_diff'][mask_1_l2], frequencies_stretch_1[:, 1][mask_1_l2], label='mode 2', linewidth=0.5, marker='o', facecolors='none', edgecolors='green')
-    ax.scatter(geometry_params_stretch_1['l2_diff'][mask_1_l2], frequencies_stretch_1[:, 2][mask_1_l2], label='mode 3', linewidth=0.5, marker='o', facecolors='none', edgecolors='red')
-    ax.scatter(geometry_params_stretch_1['l2_diff'][mask_1_l2], frequencies_stretch_1[:, 3][mask_1_l2], label='mode 4', linewidth=0.5, marker='o', facecolors='none', edgecolors='orange')
+    ax.scatter(geometry_params_stretch_1_r['l2_diff'][mask_1_l2],
+               frequencies_stretch_1_r[:, 0][mask_1_l2],
+               label='mode 1', linewidth=0.5, marker='o', facecolors='none', edgecolors='blue')
+    ax.scatter(geometry_params_stretch_1_r['l2_diff'][mask_1_l2],
+               frequencies_stretch_1_r[:, 1][mask_1_l2],
+               label='mode 2', linewidth=0.5, marker='o', facecolors='none', edgecolors='green')
+    ax.scatter(geometry_params_stretch_1_r['l2_diff'][mask_1_l2],
+               frequencies_stretch_1_r[:, 2][mask_1_l2],
+               label='mode 3', linewidth=0.5, marker='o', facecolors='none', edgecolors='red')
+    ax.scatter(geometry_params_stretch_1_r['l2_diff'][mask_1_l2],
+               frequencies_stretch_1_r[:, 3][mask_1_l2],
+               label='mode 4', linewidth=0.5, marker='o', facecolors='none', edgecolors='orange')
 
     # ax.line([equilibrium_length_double, equilibrium_length_double],
     #         [0, ax.get_ylim()[1]],
@@ -206,10 +275,18 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots()
 
-    ax.scatter(geometry_params_stretch_1['l12_diff'][mask_1_l12], frequencies_stretch_1[:, 0][mask_1_l12], label='mode 1', linewidth=0.5, marker='o', facecolors='none', edgecolors='blue')
-    ax.scatter(geometry_params_stretch_1['l12_diff'][mask_1_l12], frequencies_stretch_1[:, 1][mask_1_l12], label='mode 2', linewidth=0.5, marker='o', facecolors='none', edgecolors='green')
-    ax.scatter(geometry_params_stretch_1['l12_diff'][mask_1_l12], frequencies_stretch_1[:, 2][mask_1_l12], label='mode 3', linewidth=0.5, marker='o', facecolors='none', edgecolors='red')
-    ax.scatter(geometry_params_stretch_1['l12_diff'][mask_1_l12], frequencies_stretch_1[:, 3][mask_1_l12], label='mode 4', linewidth=0.5, marker='o', facecolors='none', edgecolors='orange')
+    ax.scatter(geometry_params_stretch_1_r['l12_diff'][mask_1_l12],
+               frequencies_stretch_1_r[:, 0][mask_1_l12],
+               label='mode 1', linewidth=0.5, marker='o', facecolors='none', edgecolors='blue')
+    ax.scatter(geometry_params_stretch_1_r['l12_diff'][mask_1_l12],
+               frequencies_stretch_1_r[:, 1][mask_1_l12],
+               label='mode 2', linewidth=0.5, marker='o', facecolors='none', edgecolors='green')
+    ax.scatter(geometry_params_stretch_1_r['l12_diff'][mask_1_l12],
+               frequencies_stretch_1_r[:, 2][mask_1_l12],
+               label='mode 3', linewidth=0.5, marker='o', facecolors='none', edgecolors='red')
+    ax.scatter(geometry_params_stretch_1_r['l12_diff'][mask_1_l12],
+               frequencies_stretch_1_r[:, 3][mask_1_l12],
+               label='mode 4', linewidth=0.5, marker='o', facecolors='none', edgecolors='orange')
 
     ax.autoscale(axis='both', tight=True)
 
