@@ -705,6 +705,13 @@ if __name__ == '__main__':
                                 ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
                                 labels=labels,
                                 colors=colors)
+    do_result_convergence_plots(frequencies_CO2_d,
+                                name='frequency_same_set_2QM',
+                                n_qm_start=2,
+                                n_qm_end=2,
+                                ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
+                                labels=labels,
+                                colors=colors)
     do_result_convergence_plots_gaps(frequencies_CO2_d,
                                      name='frequency_same_set',
                                      func_to_apply=lambda x: x,
