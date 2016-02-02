@@ -182,7 +182,7 @@ def analysis_single(numbins, n_qm, n_mm):
     return
 
 
-def analysis_all_methods_all_basis_sets(numbins):
+def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
 
     # Write the means and standard deviations to a CSV file if asked.
     # if args.csv:
@@ -201,8 +201,8 @@ def analysis_all_methods_all_basis_sets(numbins):
     for basis_set in basis_sets:
         for idx, method in enumerate(methods):
 
-            pairs = sorted(zip(snapnums_d[method][basis_set][0][0],
-                               frequencies_d[method][basis_set][0][0]),
+            pairs = sorted(zip(snapnums_d[method][basis_set][n_qm][n_mm],
+                               frequencies_d[method][basis_set][n_qm][n_mm]),
                            key=lambda x: x[1])
             # snapnums = [x[0] for x in pairs]
             frequencies = [x[1] for x in pairs]
@@ -276,7 +276,11 @@ def analysis_all_methods_all_basis_sets(numbins):
                          label='experiment')
 
             ax_hist.legend(fancybox=True, loc='upper right', framealpha=0.50)
-            filename = 'hist_{}_{}_{}.pdf'.format(method, basis_set, numbins)
+            filename = 'hist_{}_{}_{}QM_{}MM_{}.pdf'.format(method,
+                                                            basis_set,
+                                                            n_qm,
+                                                            n_mm,
+                                                            numbins)
             fig_hist.savefig(filename, bbox_inches='tight')
             print('Saving {}'.format(filename))
 
@@ -326,7 +330,7 @@ def analysis_all_methods_all_basis_sets(numbins):
     ax.tick_params(direction='out',
                    top='off',
                    bottom='off')
-    filename = 'snapshots_ordered.pdf'
+    filename = 'snapshots_ordered_{}QM_{}MM.pdf'.format(n_qm, n_mm)
     fig.savefig(filename, bbox_inches='tight')
     print('Saving {}'.format(filename))
 
@@ -350,7 +354,7 @@ def analysis_all_methods_all_basis_sets(numbins):
                                  fontsize='large')
     ax_combined_hists.set_title('probability density functions')
     ax.tick_params(direction='out')
-    filename = 'combined_pdfs.pdf'
+    filename = 'combined_pdfs_{}QM_{}MM.pdf'.format(n_qm, n_mm)
     fig_combined_hists.savefig(filename, bbox_inches='tight')
     print('Saving {}'.format(filename))
 
@@ -397,7 +401,9 @@ if __name__ == '__main__':
         snapnums_d = pickle.load(picklefile)
 
     if args.analysis_type == 'snapshot_method_dependence':
-        analysis_all_methods_all_basis_sets(numbins=args.numbins)
+        analysis_all_methods_all_basis_sets(numbins=args.numbins,
+                                            n_qm=args.n_qm,
+                                            n_mm=args.n_mm)
     elif args.analysis_type == 'single':
         analysis_single(numbins=args.numbins,
                         n_qm=args.n_qm,
