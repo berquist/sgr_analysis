@@ -30,7 +30,7 @@ basis_sets = OrderedDict([
 
 CO2_types = OrderedDict([
     ('flex', 'flex'),
-    # ('rigid', 'rigid'),
+    ('rigid', 'rigid'),
 ])
 
 def getargs():
@@ -118,6 +118,7 @@ if __name__ == '__main__':
         print("Parsing dipoles...")
         for CO2_type in CO2_types:
             dipoles[CO2_type] = dict()
+            snapnums_d[CO2_type] = dict()
             for method in methods:
                 dipoles[CO2_type][method] = dict()
                 snapnums_d[CO2_type][method] = dict()
