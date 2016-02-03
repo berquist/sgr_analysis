@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""analysis.py: Where most of the analysis for the 'droplet' snapshots
+is.
+"""
+
 from __future__ import print_function
 from __future__ import division
 
@@ -77,7 +81,7 @@ def condon():
     ax.tick_params(direction='out', top='off', right='off')
     ax.set_xlabel(r"$\nu_{3}$ frequency (cm$^{-1}$)")
     ax.set_ylabel(r"$\nu_{3}$ intensity (km/mol)")
-    ax.set_title("Condon approximation")
+    # ax.set_title("Condon approximation")
     ax.legend(loc='lower right',
               fancybox=True,
               framealpha=0.50,
@@ -132,7 +136,8 @@ def do_result_convergence_plots(results_d,
                                 func_to_apply=lambda x: x,
                                 ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
                                 labels=None,
-                                colors=None):
+                                colors=None,
+                                errorbars=False):
 
     slice_partial = partial(slice, start=n_qm_start, end=n_qm_end + 1)
 
@@ -141,21 +146,48 @@ def do_result_convergence_plots(results_d,
     fig, ax = plt.subplots()
 
     for n_qm in filter(slice_partial, sorted(results_d)):
-        print("Doing plots for {}".format(labels[n_qm]))
+        if labels:
+            print("Doing plots for {}".format(labels[n_qm]))
+        else:
+            print("Doing plots of some kind.")
         ticks = []
         results_single_qm_all_mm = []
         results_single_qm_all_mm_mean = []
+        results_single_qm_all_mm_stdev = []
         for n_mm in possible_keys:
             results_single_qm_single_mm = [func_to_apply(x) for x in results_d[n_qm][n_mm]]
             if len(results_single_qm_single_mm) > 0:
                 results_single_qm_all_mm.extend(results_single_qm_single_mm)
                 ticks.append(n_mm)
                 results_single_qm_all_mm_mean.append(np.mean(results_single_qm_single_mm))
-        ax.plot(ticks,
-                results_single_qm_all_mm_mean,
-                marker=markers[n_qm],
-                label=labels[n_qm],
-                color=colors[n_qm])
+                results_single_qm_all_mm_stdev.append(np.std(results_single_qm_single_mm))
+        # What's a cleaner way to do this...
+        if markers:
+            marker = markers[n_qm]
+        else:
+            marker = None
+        if labels:
+            label = labels[n_qm]
+        else:
+            label = None
+        if colors:
+            color = colors[n_qm]
+        else:
+            color = None
+        if errorbars:
+            ax.errorbar(ticks,
+                        results_single_qm_all_mm_mean,
+                        yerr=results_single_qm_all_mm_stdev,
+                        marker=marker,
+                        label=label,
+                        color=color)
+        else:
+            ax.plot(ticks,
+                    results_single_qm_all_mm_mean,
+                    marker=marker,
+                    label=label,
+                    color=color)
+
 
     ax.set_xscale('symlog', basex=2)
     ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
@@ -165,7 +197,7 @@ def do_result_convergence_plots(results_d,
     ax.tick_params(direction='out', top='off', right='off')
     ax.set_xlabel("# IL pairs treated as point charges")
     ax.set_ylabel(ylabel)
-    ax.set_title("{} convergence w.r.t. # IL pairs treated via QM".format(name))
+    # ax.set_title("{} convergence w.r.t. # IL pairs treated via QM".format(name))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
     fig.savefig('{}_convergence.pdf'.format(name), bbox_inches='tight')
 
@@ -256,7 +288,7 @@ def do_result_convergence_plots_gaps(results_d,
     ax.tick_params(direction='out', top='off', right='off')
     ax.set_xlabel('# IL pairs treated as point charges')
     ax.set_ylabel(r'difference in {}'.format(ylabel))
-    ax.set_title('gaps')
+    # ax.set_title('gaps')
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
     filename = '{}_convergence_gaps.pdf'.format(name)
     print('Saving {}'.format(filename))
@@ -409,7 +441,7 @@ def plot_single_snapshot_results(snapnum,
         ax.tick_params(direction='out', top='off', right='off')
         ax.set_xlabel("total # of IL pairs included")
         ax.set_ylabel(ylabel)
-        ax.set_title("snapshot {}".format(snapnum))
+        # ax.set_title("snapshot {}".format(snapnum))
         ax.legend(loc='best', fancybox=True, framealpha=0.50)
     if do_manip_fig:
         filename = '{}_convergence_snap{}.pdf'.format(name, snapnum)
@@ -488,7 +520,7 @@ def plot_single_snapshot_results_qm_gaps(snapnum,
     ax.tick_params(direction='out', top='off', right='off')
     ax.set_xlabel('# IL pairs treated as point charges')
     ax.set_ylabel(r'difference in {}'.format(ylabel))
-    ax.set_title('snapshot {} gaps'.format(snapnum))
+    # ax.set_title('snapshot {} gaps'.format(snapnum))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
     filename = '{}_convergence_snap{}_gaps.pdf'.format(name, snapnum)
     print('Saving {}'.format(filename))
@@ -710,8 +742,8 @@ if __name__ == '__main__':
                                 n_qm_start=2,
                                 n_qm_end=2,
                                 ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
-                                labels=labels,
-                                colors=colors)
+                                colors=colors,
+                                errorbars=True)
     do_result_convergence_plots_gaps(frequencies_CO2_d,
                                      name='frequency_same_set',
                                      func_to_apply=lambda x: x,
