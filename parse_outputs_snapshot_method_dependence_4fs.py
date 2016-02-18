@@ -63,9 +63,10 @@ if __name__ == '__main__':
     # 4. n_qm
     # 5. n_mm
 
+    BASEDIR = "/home/eric/Chemistry/calc.sgr/droplets/snapshot_method_dependence_4fs"
+
     if args.file_operation == "save":
         print("Trying to find output files...")
-        basedir = "/home/eric/Chemistry/calc.sgr/droplets/snapshot_method_dependence_4fs"
         outputfiles = dict()
         for CO2_type in CO2_types:
             outputfiles[CO2_type] = dict()
@@ -75,7 +76,7 @@ if __name__ == '__main__':
                     outputfiles[CO2_type][method][basis_set] = dict()
                     # hacky hack hack
                     for n_qm in (0, ):
-                        outputfiles[CO2_type][method][basis_set][n_qm] = get_outputfiles_from_path(os.path.join(basedir, "inputs_freq_{CO2_type}_0qm_{method}_{basis_set}".format(**locals())))
+                        outputfiles[CO2_type][method][basis_set][n_qm] = get_outputfiles_from_path(os.path.join(BASEDIR, "inputs_freq_{CO2_type}_0qm_{method}_{basis_set}".format(**locals())))
                         outputfiles[CO2_type][method][basis_set][n_qm] = filter_n_mm_into_dict(outputfiles[CO2_type][method][basis_set][n_qm])
         with open('outputfiles.pypickle', 'wb') as picklefile:
             pickle.dump(outputfiles, picklefile)
