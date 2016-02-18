@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 
+"""analysis_snapshot_method_dependence_fft.py: Plot the actual
+vibrational spectra of parsed MD snapshots separated by 4 fs (to give
+a spectral width of ~8333 cm^-1) by taking the FFT of the dipole
+autocorrelation function (ACF).
+
+An important note is that although some dictionary lookups say '256',
+implying the presence of 256 IL pairs as point charges, there are far
+fewer than that, and the amount varies. It is simply for convenience.
+
+"""
+
 from __future__ import print_function
 from __future__ import division
 
@@ -61,14 +72,22 @@ if __name__ == '__main__':
     # these are the raw frequencies; I want to plot the
     # distribution/histogram
     frequencies_flex_b3lyp_lp_0_0 = np.array(frequencies['flex']['b3lyp']['lp'][0][0])
+    frequencies_flex_b3lyp_lp_0_all = np.array(frequencies['flex']['b3lyp']['lp'][0][256])
     frequencies_rigid_b3lyp_lp_0_0 = np.array(frequencies['rigid']['b3lyp']['lp'][0][0])
+    frequencies_rigid_b3lyp_lp_0_all = np.array(frequencies['rigid']['b3lyp']['lp'][0][256])
     dipoles_flex_b3lyp_lp_0_0 = np.array(dipoles['flex']['b3lyp']['lp'][0][0])
+    dipoles_flex_b3lyp_lp_0_all = np.array(dipoles['flex']['b3lyp']['lp'][0][256])
     # dipoles_rigid_b3lyp_lp_0_0 = np.array(dipoles['rigid']['b3lyp']['lp'][0][0])
-    frequencies_flex, intensities_flex = make_vibspectrum_from_dipoles(dipoles_flex_b3lyp_lp_0_0, time_step)
-    # frequencies_rigid, intensities_rigid = make_vibspectrum_from_dipoles(dipoles_rigid_b3lyp_lp_0_0, time_step)
-    assert frequencies_flex.shape == intensities_flex.shape
-    # assert frequencies_rigid.shape == intensities_rigid.shape
-    # print(frequencies_flex.shape, frequencies_rigid.shape)
+    dipoles_rigid_b3lyp_lp_0_all = np.array(dipoles['rigid']['b3lyp']['lp'][0][256])
+    print(dipoles_flex_b3lyp_lp_0_0.shape, dipoles_flex_b3lyp_lp_0_all.shape, dipoles_rigid_b3lyp_lp_0_all.shape)
+    frequencies_flex_0_0, intensities_flex_0_0 = make_vibspectrum_from_dipoles(dipoles_flex_b3lyp_lp_0_0, time_step)
+    frequencies_flex_0_all, intensities_flex_0_all = make_vibspectrum_from_dipoles(dipoles_flex_b3lyp_lp_0_all, time_step)
+    # frequencies_rigid_0_0, intensities_rigid_0_0 = make_vibspectrum_from_dipoles(dipoles_rigid_b3lyp_lp_0_0, time_step)
+    frequencies_rigid_0_all, intensities_rigid_0_all = make_vibspectrum_from_dipoles(dipoles_rigid_b3lyp_lp_0_all, time_step)
+    assert frequencies_flex_0_0.shape == intensities_flex_0_0.shape
+    assert frequencies_flex_0_all.shape == intensities_flex_0_all.shape
+    # assert frequencies_rigid_0_0.shape == intensities_rigid_0_0.shape
+    assert frequencies_rigid_0_all.shape == intensities_rigid_0_all.shape
 
     ## Plot the IR spectrum for the flexible and rigid snapshots as
     ## the FFT of the dipole autocorrelation function.
@@ -78,15 +97,17 @@ if __name__ == '__main__':
     # wavenumber_cutoff_lo = 0.0
     # wavenumber_cutoff_hi = 5000.0
 
-    mask_lo = frequencies_flex >= wavenumber_cutoff_lo
-    mask_hi = frequencies_flex <= wavenumber_cutoff_hi
+    mask_lo = frequencies_flex_0_0 >= wavenumber_cutoff_lo
+    mask_hi = frequencies_flex_0_0 <= wavenumber_cutoff_hi
     mask = np.logical_and(mask_lo, mask_hi)
     ix = np.where(mask)[0]
 
     fig, ax = plt.subplots()
 
-    ax.plot(frequencies_flex[ix], intensities_flex[ix], label='flex', linewidth=0.50)
-    # ax.plot(frequencies_rigid[ix], intensities_rigid[ix], label='rigid', linewidth=0.50)
+    ax.plot(frequencies_flex_0_0[ix], intensities_flex_0_0[ix], label='flex (0, 0)', linewidth=0.50)
+    ax.plot(frequencies_flex_0_all[ix], intensities_flex_0_all[ix], label='flex (0, all)', linewidth=0.50)
+    # ax.plot(frequencies_rigid_0_0[ix], intensities_rigid_0_0[ix], label='rigid (0, 0)', linewidth=0.50)
+    ax.plot(frequencies_rigid_0_all[ix], intensities_rigid_0_all[ix], label='rigid (0, all)', linewidth=0.50)
 
     ax.set_xlabel('frequency (cm$^{-1}$)')
     ax.set_ylabel('intensity (a.u.)')
@@ -134,10 +155,14 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots()
 
-    ax.hist(frequencies_flex_b3lyp_lp_0_0, bins=bins_flex, normed=True, label='flex hist')
-    # ax.hist(frequencies_rigid_b3lyp_lp_0_0, bins=bins_rigid, normed=True, label='rigid hist')
-    ax.plot(linspace_bins_flex, pdf_bins_flex, label='flex PDF', linewidth=0.50, linestyle='--')
-    # ax.plot(linspace_bins_rigid, pdf_bins_rigid, label='rigid PDF', linewidth=0.50, linestyle='--')
+    # ax.hist(frequencies_flex_b3lyp_lp_0_0, bins=bins_flex, normed=True, label='flex (0, 0) hist')
+    # ax.hist(frequencies_flex_b3lyp_lp_0_all, bins=bins_flex, normed=True, label='flex (0, all) hist')
+    # # ax.hist(frequencies_rigid_b3lyp_lp_0_0, bins=bins_rigid, normed=True, label='rigid (0, 0) hist')
+    # ax.hist(frequencies_rigid_b3lyp_lp_0_all, bins=bins_rigid, normed=True, label='rigid (0, all) hist')
+    # ax.plot(linspace_bins_flex, pdf_bins_flex, label='flex (0, 0) PDF', linewidth=0.50, linestyle='--')
+    # ax.plot(linspace_bins_flex_0_all, pdf_bins_flex_0_all, label='flex (0, all) PDF', linewidth=0.50, linestyle='--')
+    # # ax.plot(linspace_bins_rigid_0_0, pdf_bins_rigid_0_0, label='rigid (0, 0) PDF', linewidth=0.50, linestyle='--')
+    # ax.plot(linspace_bins_rigid_0_all, pdf_bins_rigid_0_all, label='rigid (0, all) PDF', linewidth=0.50, linestyle='--')
 
     ax.set_xlabel('harmonic frequency (cm$^{-1}$)')
     # ax.set_ylabel('')
@@ -151,8 +176,8 @@ if __name__ == '__main__':
     fig, ax = plt.subplots()
 
     # for this to work, all the data should be normalized to something (?)
-    ax.plot(frequencies_flex[ix], intensities_flex[ix], label='flex dip-dip', linewidth=0.50)
-    ax.hist(frequencies_flex_b3lyp_lp_0_0, bins=bins_flex, normed=True, label='flex hist')
+    ax.plot(frequencies_flex_0_0[ix], intensities_flex_0_0[ix], label='flex (0, 0) dip-dip', linewidth=0.50)
+    ax.hist(frequencies_flex_b3lyp_lp_0_0, bins=bins_flex, normed=True, label='flex (0, 0) hist')
     ax.plot(linspace_bins_flex, pdf_bins_flex, label='flex PDF', linewidth=0.50, linestyle='--')
 
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
