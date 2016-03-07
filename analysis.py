@@ -57,8 +57,11 @@ def condon():
             frequencies_all.extend(f)
             intensities_all.extend(i)
             print('{} QM/{} MM'.format(n_qm, n_mm))
-            slope, intercept, rsq = pprint_linregress(f, i)
-            csvwriter.writerow([n_qm, n_mm, len(f), slope, intercept, rsq])
+            try:
+                slope, intercept, rsq = pprint_linregress(f, i)
+                csvwriter.writerow([n_qm, n_mm, len(f), slope, intercept, rsq])
+            except:
+                pass
         assert len(frequencies_single_qm_all_mm) == len(intensities_single_qm_all_mm)
         ax.scatter(frequencies_single_qm_all_mm,
                    intensities_single_qm_all_mm,
@@ -78,10 +81,9 @@ def condon():
     ax.set_ylim((0.0, 1000.0))
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
-    ax.tick_params(direction='out', top='off', right='off')
+    ax.tick_params(direction='out')
     ax.set_xlabel(r"$\nu_{3}$ frequency (cm$^{-1}$)")
     ax.set_ylabel(r"$\nu_{3}$ intensity (km/mol)")
-    # ax.set_title("Condon approximation")
     ax.legend(loc='lower right',
               fancybox=True,
               framealpha=0.50,
@@ -194,7 +196,7 @@ def do_result_convergence_plots(results_d,
 
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
-    ax.tick_params(direction='out', top='off', right='off')
+    ax.tick_params(direction='out')
     ax.set_xlabel("# IL pairs treated as point charges")
     ax.set_ylabel(ylabel)
     # ax.set_title("{} convergence w.r.t. # IL pairs treated via QM".format(name))
@@ -226,7 +228,7 @@ def do_result_convergence_plots(results_d,
     ax.set_xticks(ticks)
     ax.set_xticklabels(ticks)
     ax.yaxis.set_major_formatter(y_formatter)
-    ax.tick_params(direction='out', top='off', right='off')
+    ax.tick_params(direction='out')
     ax.set_xlabel("# QM IL pairs")
     ax.set_ylabel('mean {}'.format(ylabel))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
@@ -285,7 +287,7 @@ def do_result_convergence_plots_gaps(results_d,
     ax.set_ylim(ax.get_ylim()[::-1])
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
-    ax.tick_params(direction='out', top='off', right='off')
+    ax.tick_params(direction='out')
     ax.set_xlabel('# IL pairs treated as point charges')
     ax.set_ylabel(r'difference in {}'.format(ylabel))
     # ax.set_title('gaps')
@@ -438,7 +440,7 @@ def plot_single_snapshot_results(snapnum,
         ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())
         y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
         ax.yaxis.set_major_formatter(y_formatter)
-        ax.tick_params(direction='out', top='off', right='off')
+        ax.tick_params(direction='out')
         ax.set_xlabel("total # of IL pairs included")
         ax.set_ylabel(ylabel)
         # ax.set_title("snapshot {}".format(snapnum))
@@ -517,7 +519,7 @@ def plot_single_snapshot_results_qm_gaps(snapnum,
     ax.set_ylim(ax.get_ylim()[::-1])
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
-    ax.tick_params(direction='out', top='off', right='off')
+    ax.tick_params(direction='out')
     ax.set_xlabel('# IL pairs treated as point charges')
     ax.set_ylabel(r'difference in {}'.format(ylabel))
     # ax.set_title('snapshot {} gaps'.format(snapnum))
@@ -650,78 +652,78 @@ if __name__ == '__main__':
                                    name='frequency',
                                    n_qm_start=0,
                                    n_qm_end=3)
-    do_result_convergence_analysis(intensities_CO2_d,
-                                   name='intensity',
-                                   n_qm_start=0,
-                                   n_qm_end=2)
-    do_result_convergence_analysis(dipoles_d,
-                                   name='dipole',
-                                   n_qm_start=1,
-                                   n_qm_end=2,
-                                   func_to_apply=npl.norm)
-    if args.include_noCT:
-        do_result_convergence_analysis(frequencies_noCT_CO2_d,
-                                       name='frequency_noCT',
-                                       n_qm_start=1,
-                                       n_qm_end=2)
-        do_result_convergence_analysis(intensities_noCT_CO2_d,
-                                       name='intensity_noCT',
-                                       n_qm_start=1,
-                                       n_qm_end=2)
+    # do_result_convergence_analysis(intensities_CO2_d,
+    #                                name='intensity',
+    #                                n_qm_start=0,
+    #                                n_qm_end=2)
+    # do_result_convergence_analysis(dipoles_d,
+    #                                name='dipole',
+    #                                n_qm_start=1,
+    #                                n_qm_end=2,
+    #                                func_to_apply=npl.norm)
+    # if args.include_noCT:
+    #     do_result_convergence_analysis(frequencies_noCT_CO2_d,
+    #                                    name='frequency_noCT',
+    #                                    n_qm_start=1,
+    #                                    n_qm_end=2)
+    #     do_result_convergence_analysis(intensities_noCT_CO2_d,
+    #                                    name='intensity_noCT',
+    #                                    n_qm_start=1,
+    #                                    n_qm_end=2)
 
     ###################################
 
     # plots!
 
-    do_result_convergence_plots(frequencies_CO2_d,
-                                name='frequency',
-                                n_qm_start=0,
-                                n_qm_end=3,
-                                ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
-                                labels=labels,
-                                colors=colors)
-    do_result_convergence_plots_gaps(frequencies_CO2_d,
-                                     name='frequency',
-                                     func_to_apply=lambda x: x,
-                                     ylabel=r'$\nu_{3}$ frequency (cm$^{-1}$)',
-                                     symbol='\omega')
-    do_result_convergence_plots(intensities_CO2_d,
-                                name='intensity',
-                                n_qm_start=0,
-                                n_qm_end=3,
-                                ylabel=r"$\nu_{3}$ intensity (cm$^{-1}$)",
-                                labels=labels,
-                                colors=colors)
-    do_result_convergence_plots(dipoles_d,
-                                name='dipole',
-                                n_qm_start=1,
-                                n_qm_end=3,
-                                ylabel='total dipole moment (Debye)',
-                                func_to_apply=npl.norm,
-                                labels=labels,
-                                colors=colors)
-    do_result_convergence_plots(dipoles_d,
-                                name='dipole_0qm',
-                                n_qm_start=0,
-                                n_qm_end=0,
-                                ylabel='total dipole moment (Debye)',
-                                func_to_apply=npl.norm,
-                                labels=labels,
-                                colors=colors)
-    if args.include_noCT:
-        do_result_convergence_plots(frequencies_noCT_CO2_d,
-                                    name='frequency_noCT',
-                                    n_qm_start=1, n_qm_end=2,
-                                    ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
-                                    labels=labels_noCT,
-                                    colors=colors_noCT)
-        do_result_convergence_plots(intensities_noCT_CO2_d,
-                                    name='intensity_noCT',
-                                    n_qm_start=1,
-                                    n_qm_end=2,
-                                    ylabel=r"$\nu_{3}$ intensity (cm$^{-1}$)",
-                                    labels=labels_noCT,
-                                    colors=colors_noCT)
+    # do_result_convergence_plots(frequencies_CO2_d,
+    #                             name='frequency',
+    #                             n_qm_start=0,
+    #                             n_qm_end=3,
+    #                             ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
+    #                             labels=labels,
+    #                             colors=colors)
+    # do_result_convergence_plots_gaps(frequencies_CO2_d,
+    #                                  name='frequency',
+    #                                  func_to_apply=lambda x: x,
+    #                                  ylabel=r'$\nu_{3}$ frequency (cm$^{-1}$)',
+    #                                  symbol='\omega')
+    # do_result_convergence_plots(intensities_CO2_d,
+    #                             name='intensity',
+    #                             n_qm_start=0,
+    #                             n_qm_end=3,
+    #                             ylabel=r"$\nu_{3}$ intensity (cm$^{-1}$)",
+    #                             labels=labels,
+    #                             colors=colors)
+    # do_result_convergence_plots(dipoles_d,
+    #                             name='dipole',
+    #                             n_qm_start=1,
+    #                             n_qm_end=3,
+    #                             ylabel='total dipole moment (Debye)',
+    #                             func_to_apply=npl.norm,
+    #                             labels=labels,
+    #                             colors=colors)
+    # do_result_convergence_plots(dipoles_d,
+    #                             name='dipole_0qm',
+    #                             n_qm_start=0,
+    #                             n_qm_end=0,
+    #                             ylabel='total dipole moment (Debye)',
+    #                             func_to_apply=npl.norm,
+    #                             labels=labels,
+    #                             colors=colors)
+    # if args.include_noCT:
+    #     do_result_convergence_plots(frequencies_noCT_CO2_d,
+    #                                 name='frequency_noCT',
+    #                                 n_qm_start=1, n_qm_end=2,
+    #                                 ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
+    #                                 labels=labels_noCT,
+    #                                 colors=colors_noCT)
+    #     do_result_convergence_plots(intensities_noCT_CO2_d,
+    #                                 name='intensity_noCT',
+    #                                 n_qm_start=1,
+    #                                 n_qm_end=2,
+    #                                 ylabel=r"$\nu_{3}$ intensity (cm$^{-1}$)",
+    #                                 labels=labels_noCT,
+    #                                 colors=colors_noCT)
 
     condon()
 
@@ -739,11 +741,10 @@ if __name__ == '__main__':
                                 colors=colors)
     do_result_convergence_plots(frequencies_CO2_d,
                                 name='frequency_same_set_2QM',
-                                n_qm_start=2,
+                                n_qm_start=0,
                                 n_qm_end=2,
                                 ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
-                                colors=colors,
-                                errorbars=True)
+                                colors=colors)
     do_result_convergence_plots_gaps(frequencies_CO2_d,
                                      name='frequency_same_set',
                                      func_to_apply=lambda x: x,
@@ -767,31 +768,31 @@ if __name__ == '__main__':
                                                  func_to_apply=lambda x: x,
                                                  ylabel=r'$\nu_{3}$ frequency (cm$^{-1}$)',
                                                  symbol='\omega')
-            plot_single_snapshot_results(snapnum,
-                                         snapnums_frequencies_d,
-                                         intensities_CO2_d,
-                                         name='intensity',
-                                         func_to_apply=lambda x: x,
-                                         ylabel=r'$\nu_{3}$ intensity (km/mol)')
-            plot_single_snapshot_results_qm_gaps(snapnum,
-                                                 snapnums_frequencies_d,
-                                                 intensities_CO2_d,
-                                                 name='intensity',
-                                                 func_to_apply=lambda x: x,
-                                                 ylabel=r'$\nu_{3}$ intensity (km/mol)',
-                                                 symbol='I')
-            plot_single_snapshot_results(snapnum,
-                                         snapnums_dipoles_d,
-                                         dipoles_d,
-                                         name='dipole',
-                                         func_to_apply=npl.norm,
-                                         ylabel='total dipole moment (Debye)')
-            plot_single_snapshot_results_qm_gaps(snapnum,
-                                                 snapnums_dipoles_d,
-                                                 dipoles_d,
-                                                 name='dipole',
-                                                 func_to_apply=npl.norm,
-                                                 ylabel='total dipole moment (Debye)',
-                                                 symbol='\mu')
+            # plot_single_snapshot_results(snapnum,
+            #                              snapnums_frequencies_d,
+            #                              intensities_CO2_d,
+            #                              name='intensity',
+            #                              func_to_apply=lambda x: x,
+            #                              ylabel=r'$\nu_{3}$ intensity (km/mol)')
+            # plot_single_snapshot_results_qm_gaps(snapnum,
+            #                                      snapnums_frequencies_d,
+            #                                      intensities_CO2_d,
+            #                                      name='intensity',
+            #                                      func_to_apply=lambda x: x,
+            #                                      ylabel=r'$\nu_{3}$ intensity (km/mol)',
+            #                                      symbol='I')
+            # plot_single_snapshot_results(snapnum,
+            #                              snapnums_dipoles_d,
+            #                              dipoles_d,
+            #                              name='dipole',
+            #                              func_to_apply=npl.norm,
+            #                              ylabel='total dipole moment (Debye)')
+            # plot_single_snapshot_results_qm_gaps(snapnum,
+            #                                      snapnums_dipoles_d,
+            #                                      dipoles_d,
+            #                                      name='dipole',
+            #                                      func_to_apply=npl.norm,
+            #                                      ylabel='total dipole moment (Debye)',
+            #                                      symbol='\mu')
 
     ###################################
