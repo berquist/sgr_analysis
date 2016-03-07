@@ -8,5 +8,6 @@ parse:
 analysis:
 	python ${ANALYSIS_DIR}/analysis_histograms.py snapshot_method_dependence --numbins=5 --n_qm=0 --n_mm=0
 	python ${ANALYSIS_DIR}/analysis_histograms.py snapshot_method_dependence --numbins=5 --n_qm=0 --n_mm=256
+	python ${ANALYSIS_DIR}/analysis_histograms.py difference --numbins=5
 	python ${ANALYSIS_DIR}/pick_snapshots.py --sample-method=b3lyp --sample-basis-set=6-31gdp --numbins=5
 	python ${ANALYSIS_DIR}/analysis_snapshot_method_dependence.py

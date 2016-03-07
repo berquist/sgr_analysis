@@ -191,7 +191,7 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
     #     csvwriter = csv.writer(csvfh)
     #     csvwriter.writerow(['method', 'basis set', 'mean', 'stdev (pop)'])
 
-    fig, ax = plt.subplots()
+    fig_snapshots_ordered, ax_snapshots_ordered = plt.subplots()
     fig_combined_hists, ax_combined_hists = plt.subplots()
 
     cmap = cm.get_cmap('viridis')
@@ -291,7 +291,7 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
 
             c = cmap(float(idx) / (num_plot_lines - 1))
 
-            ax.plot(frequencies,
+            ax_snapshots_ordered.plot(frequencies,
                     label='{}/{}'.format(methods[method], basis_sets[basis_set]),
                     # color=colors[method],
                     color=c,
@@ -305,7 +305,7 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
                                    linestyle=linestyles[basis_set])
 
     # Add the experimental BMIM/PF6 frequency as a line.
-    ax.plot(ax.get_xlim(),
+    ax_snapshots_ordered.plot(ax_snapshots_ordered.get_xlim(),
             [2340.0, 2340.0],
             marker='',
             linestyle=':',
@@ -314,27 +314,30 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
 
     # Having the snapshot number start at 0 looks bad and doesn't
     # make sense.
-    # xticks = ax.get_xticks()
+    # xticks = ax_snapshots_ordered.get_xticks()
     # xticks[0] = 1
-    # ax.set_xticks(xticks)
-    ax.set_xticklabels([])
+    # ax_snapshots_ordered.set_xticks(xticks)
+    ax_snapshots_ordered.set_xticklabels([])
 
-    ax.legend(fancybox=True,
+    ax_snapshots_ordered.legend(fancybox=True,
               loc='best',
               framealpha=0.50,
               fontsize='small')
-    # ax.set_xlabel('snapshot #',
+    # ax_snapshots_ordered.set_xlabel('snapshot #',
     #               fontsize='large')
-    ax.set_ylabel(r'$\nu_3$ harmonic frequency (cm$^{-1}$)',
+    ax_snapshots_ordered.set_ylabel(r'$\nu_3$ harmonic frequency (cm$^{-1}$)',
                   fontsize='large')
-    ax.tick_params(direction='out',
+    ax_snapshots_ordered.tick_params(direction='out',
                    top='off',
                    bottom='off')
     filename = 'snapshots_ordered_{}QM_{}MM.pdf'.format(n_qm, n_mm)
-    fig.savefig(filename, bbox_inches='tight')
+    fig_snapshots_ordered.savefig(filename, bbox_inches='tight')
     print('Saving {}'.format(filename))
 
-    plt.close(fig)
+    for line in ax_snapshots_ordered.get_lines():
+        print(len(line.get_ydata()), line.get_ydata())
+
+    plt.close(fig_snapshots_ordered)
 
     # Add the experimental BMIM/PF6 frequency as a line.
     ax_combined_hists.plot([2340.0, 2340.0],
@@ -353,10 +356,13 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
     ax_combined_hists.set_ylabel('arbitrary units',
                                  fontsize='large')
     ax_combined_hists.set_title('probability density functions')
-    ax.tick_params(direction='out')
+    ax_combined_hists.tick_params(direction='out')
     filename = 'combined_pdfs_{}QM_{}MM.pdf'.format(n_qm, n_mm)
     fig_combined_hists.savefig(filename, bbox_inches='tight')
     print('Saving {}'.format(filename))
+
+    for line in ax_combined_hists.get_lines():
+        print(len(line.get_ydata()), line.get_ydata())
 
     plt.close(fig_combined_hists)
 
@@ -364,6 +370,62 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
     #     csvfh.close()
 
     return
+
+
+def analysis_difference(numbins):
+    """Plot the difference between the 0 QM/0 MM and 0 QM/256 MM data."""
+
+    cmap = cm.get_cmap('viridis')
+
+    num_plot_lines = len(methods)
+
+    fig, ax = plt.subplots()
+
+    for basis_set in basis_sets:
+        for idx, method in enumerate(methods):
+
+            pairs_0 = sorted(zip(snapnums_d[method][basis_set][0][0],
+                                 frequencies_d[method][basis_set][0][0]),
+                             key=lambda x: x[1])
+            pairs_256 = sorted(zip(snapnums_d[method][basis_set][0][256],
+                                   frequencies_d[method][basis_set][0][256]),
+                               key=lambda x: x[1])
+            frequencies_0 = np.array([x[1] for x in pairs_0])
+            frequencies_256 = np.array([x[1] for x in pairs_256])
+            frequencies_diff = frequencies_256 - frequencies_0
+
+            center_diff = np.mean(frequencies_diff)
+            binwidth_diff = np.std(frequencies_diff, ddof=1)
+            bins_diff = make_bin_edges(numbins, center_diff, binwidth_diff)
+            hist_diff, bin_edges_diff = np.histogram(frequencies_diff, bins_diff)
+            weights_diff = hist_diff / sum(hist_diff)
+            assert bins_diff.all() == bin_edges_diff.all()
+            linspace_bins_diff = np.linspace(bins_diff[0], bins_diff[-1], 300)
+            pdf_bins_diff = norm_pdf(linspace_bins_diff, mu=center_diff, sigma=binwidth_diff)
+
+            print('{}/{}'.format(methods[method], basis_sets[basis_set]))
+            print(' bins        : {}'.format(bins_diff))
+            print(' histogram   : {}'.format(hist_diff))
+            print(' weights     : {}'.format(weights_diff))
+            print('sum(pdf_bins): {}'.format(sum(pdf_bins_diff)))
+            print(frequencies_diff)
+
+            c = cmap(float(idx) / (num_plot_lines - 1))
+
+            ax.plot(linspace_bins_diff,
+                    pdf_bins_diff,
+                    label='{}/{}'.format(methods[method], basis_sets[basis_set]),
+                    color=c,
+                    linewidth=0.5,
+                    linestyle=linestyles[basis_set])
+
+    ax.legend(fancybox=True, loc='best', framealpha=0.50)
+    filename = 'difference_0qm_0mm_256mm.pdf'
+    print('Saving {}'.format(filename))
+    fig.savefig(filename, bbox_inches='tight')
+
+    plt.close('all')
+
 
 
 def getargs():
@@ -375,7 +437,8 @@ def getargs():
 
     parser.add_argument('analysis_type',
                         choices=('snapshot_method_dependence',
-                                 'single'))
+                                 'single',
+                                 'difference',))
 
     parser.add_argument('--csv', action='store_true')
 
@@ -408,5 +471,7 @@ if __name__ == '__main__':
         analysis_single(numbins=args.numbins,
                         n_qm=args.n_qm,
                         n_mm=args.n_mm)
+    elif args.analysis_type == 'difference':
+        analysis_difference(numbins=args.numbins)
     else:
         pass
