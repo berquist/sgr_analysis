@@ -265,37 +265,40 @@ if __name__ == '__main__':
 
     cmap = cm.get_cmap('viridis')
 
-    fig, ax = plt.subplots()
+    for basis_set in basis_sets:
 
-    # one series for each method used
-    num_plot_lines = len(methods)
-    for idx, method in enumerate(methods):
-        c = cmap(float(idx) / (num_plot_lines - 1))
-        ax.plot(frequencies[method]['6-31gdp'][0][0][:cutoff],
-                label=methods[method],
-                linewidth=1,
-                color=c)
+        fig, ax = plt.subplots()
 
-    # Add the experimental BMIM/PF6 frequency as a line.
-    ax.plot(ax.get_xlim(),
-            [2340.0, 2340.0],
-            marker='',
-            linestyle=':',
-            color='black',
-            label='experiment')
+        # one series for each method used
+        num_plot_lines = len(methods)
+        for idx, method in enumerate(methods):
+            c = cmap(float(idx) / (num_plot_lines - 1))
+            ax.plot(frequencies[method][basis_set][0][256][:cutoff],
+                    label=methods[method],
+                    linewidth=1,
+                    color=c)
 
-    ax.set_xticks(ticks_traj)
-    ax.set_xlim((min(ticks_traj), max(ticks_traj)))
-    ax.set_xlabel('snapshot #', fontsize='large')
-    ax.set_ylabel(r'$\nu_{3}$ harmonic frequency (cm$^{-1}$)', fontsize='large')
-    ax.tick_params(direction='out')
-    ax.legend(fancybox=True,
-              loc='upper right',
-              framealpha=0.50,
-              fontsize='small')
+        # Add the experimental BMIM/PF6 frequency as a line.
+        ax.plot(ax.get_xlim(),
+                [2340.0, 2340.0],
+                marker='',
+                linestyle=':',
+                color='black',
+                label='experiment')
 
-    filename = 'trajectory_frequencies_6-31gdp.pdf'
-    print('Saving {}'.format(filename))
-    fig.savefig(filename, bbox_inches='tight')
+        ax.set_xticks(ticks_traj)
+        ax.set_xlim((min(ticks_traj), max(ticks_traj)))
+        ax.set_xlabel('snapshot #', fontsize='large')
+        ax.set_ylabel(r'$\nu_{3}$ harmonic frequency (cm$^{-1}$)', fontsize='large')
+        ax.tick_params(direction='out')
+        ax.legend(fancybox=True,
+                  loc='upper right',
+                  framealpha=0.50,
+                  fontsize='small')
+
+        filename = 'trajectory_frequencies_{}.pdf'.format(basis_set)
+        print('Saving {}'.format(filename))
+        fig.savefig(filename, bbox_inches='tight')
+        plt.close('all')
 
     ##################################################
