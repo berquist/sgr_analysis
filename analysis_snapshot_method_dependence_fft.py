@@ -89,6 +89,16 @@ if __name__ == '__main__':
     # assert frequencies_rigid_0_0.shape == intensities_rigid_0_0.shape
     assert frequencies_rigid_0_all.shape == intensities_rigid_0_all.shape
 
+    with open('data_flex_0_0.dat', 'w') as fh:
+        for (x, y) in zip(frequencies_flex_0_0, intensities_flex_0_0):
+            fh.write('{} {}\n'.format(x, y))
+    with open('data_flex_0_all.dat', 'w') as fh:
+        for (x, y) in zip(frequencies_flex_0_all, intensities_flex_0_all):
+            fh.write('{} {}\n'.format(x, y))
+    with open('data_rigid_0_all.dat', 'w') as fh:
+        for (x, y) in zip(frequencies_rigid_0_all, intensities_rigid_0_all):
+            fh.write('{} {}\n'.format(x, y))
+
     ## Plot the IR spectrum for the flexible and rigid snapshots as
     ## the FFT of the dipole autocorrelation function.
 
@@ -100,6 +110,7 @@ if __name__ == '__main__':
     mask_lo = frequencies_flex_0_0 >= wavenumber_cutoff_lo
     mask_hi = frequencies_flex_0_0 <= wavenumber_cutoff_hi
     mask = np.logical_and(mask_lo, mask_hi)
+    # What does the ix matrix look like?
     ix = np.where(mask)[0]
 
     fig, ax = plt.subplots()
@@ -176,9 +187,9 @@ if __name__ == '__main__':
     fig, ax = plt.subplots()
 
     # for this to work, all the data should be normalized to something (?)
-    ax.plot(frequencies_flex_0_0[ix], intensities_flex_0_0[ix], label='flex (0, 0) dip-dip', linewidth=0.50)
     ax.hist(frequencies_flex_b3lyp_lp_0_0, bins=bins_flex, normed=True, label='flex (0, 0) hist')
     ax.plot(linspace_bins_flex, pdf_bins_flex, label='flex PDF', linewidth=0.50, linestyle='--')
+    ax.plot(frequencies_flex_0_0[ix], intensities_flex_0_0[ix], label='flex (0, 0) dip-dip', linewidth=0.50)
 
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
 
