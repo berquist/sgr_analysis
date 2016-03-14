@@ -31,6 +31,7 @@ if __name__ == "__main__":
         4: 0.22626263,
         5: 0.06464646,
     }
+    print('sum of weights: {}'.format(sum(weights_map.values())))
 
     bins_outputfiles = dict()
     bins_f = dict()

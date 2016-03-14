@@ -197,7 +197,7 @@ def do_result_convergence_plots(results_d,
     y_formatter = mpl.ticker.ScalarFormatter(useOffset=False)
     ax.yaxis.set_major_formatter(y_formatter)
     ax.tick_params(direction='out')
-    ax.set_xlabel("# IL pairs treated as point charges")
+    ax.set_xlabel("# IL pairs in solvent box")
     ax.set_ylabel(ylabel)
     # ax.set_title("{} convergence w.r.t. # IL pairs treated via QM".format(name))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
@@ -744,6 +744,7 @@ if __name__ == '__main__':
                                 n_qm_start=0,
                                 n_qm_end=2,
                                 ylabel=r"$\nu_{3}$ frequency (cm$^{-1}$)",
+                                labels=labels,
                                 colors=colors)
     do_result_convergence_plots_gaps(frequencies_CO2_d,
                                      name='frequency_same_set',
