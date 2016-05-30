@@ -176,6 +176,11 @@ def do_result_convergence_plots(results_d,
             color = colors[n_qm]
         else:
             color = None
+        # Make sure the data is offset properly.
+        ticks = np.array(ticks)
+        ticks += n_qm
+        # Undo the re-categorization of the last point as always being 256.
+        ticks[-1] -= n_qm
         if errorbars:
             ax.errorbar(ticks,
                         results_single_qm_all_mm_mean,
@@ -199,7 +204,6 @@ def do_result_convergence_plots(results_d,
     ax.tick_params(direction='out')
     ax.set_xlabel("# IL pairs in solvent box")
     ax.set_ylabel(ylabel)
-    # ax.set_title("{} convergence w.r.t. # IL pairs treated via QM".format(name))
     ax.legend(loc='best', fancybox=True, framealpha=0.50)
     fig.savefig('{}_convergence.pdf'.format(name), bbox_inches='tight')
 
