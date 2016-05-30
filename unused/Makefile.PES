@@ -1,0 +1,26 @@
+# -*- mode: makefile; -*-
+
+ANALYSIS_DIR=../analysis
+
+analysis:
+	python ${ANALYSIS_DIR}/plot_scan.py
+
+generate:
+	mkdir -p scan_restricted
+
+	mkdir -p scan_restricted/stretch_1 && cd scan_restricted/stretch_1 && python ../../${ANALYSIS_DIR}/generate_steps.py stretch_1 --stepsize=0.005 --stepmin=-0.5 --stepmax=5.0
+	mkdir -p scan_restricted/stretch_2 && cd scan_restricted/stretch_2 && python ../../${ANALYSIS_DIR}/generate_steps.py stretch_2 --stepsize=0.005 --stepmin=-0.5 --stepmax=5.0
+	# mkdir -p scan_restricted/bend && cd scan_restricted/bend && python ../../${ANALYSIS_DIR}/generate_steps.py bend  --stepsize=0.0025 --stepmin=-0.0025 --stepmax=0.2
+	mkdir -p scan_restricted/bend && cd scan_restricted/bend && python ../../${ANALYSIS_DIR}/generate_steps.py bend --stepsize=0.05 --stepmin=-1 --stepmax=80
+
+	mkdir -p scan_unrestricted
+
+	mkdir -p scan_unrestricted/stretch_1_singlet && cd scan_unrestricted/stretch_1_singlet && python ../../${ANALYSIS_DIR}/generate_steps.py stretch_1 --stepsize=0.005 --stepmin=-0.5 --stepmax=5.0 --unrestricted --mult=1
+	mkdir -p scan_unrestricted/stretch_2_singlet && cd scan_unrestricted/stretch_2_singlet && python ../../${ANALYSIS_DIR}/generate_steps.py stretch_2 --stepsize=0.005 --stepmin=-0.5 --stepmax=5.0 --unrestricted --mult=1
+	# mkdir -p scan_unrestricted/bend_singlet && cd scan_unrestricted/bend_singlet && python ../../${ANALYSIS_DIR}/generate_steps.py bend  --stepsize=0.0025 --stepmin=-0.0025 --stepmax=0.2  --unrestricted --mult=1
+	mkdir -p scan_unrestricted/bend_singlet && cd scan_unrestricted/bend_singlet && python ../../${ANALYSIS_DIR}/generate_steps.py bend  --stepsize=0.05 --stepmin=-1 --stepmax=80  --unrestricted --mult=1
+
+	mkdir -p scan_unrestricted/stretch_1_triplet && cd scan_unrestricted/stretch_1_triplet && python ../../${ANALYSIS_DIR}/generate_steps.py stretch_1 --stepsize=0.005 --stepmin=-0.5 --stepmax=5.0  --unrestricted --mult=3
+	mkdir -p scan_unrestricted/stretch_2_triplet && cd scan_unrestricted/stretch_2_triplet && python ../../${ANALYSIS_DIR}/generate_steps.py stretch_2 --stepsize=0.005 --stepmin=-0.5 --stepmax=5.0  --unrestricted --mult=3
+	# mkdir -p scan_unrestricted/bend_triplet && cd scan_unrestricted/bend_triplet && python ../../${ANALYSIS_DIR}/generate_steps.py bend  --stepsize=0.0025 --stepmin=-0.0025 --stepmax=0.2  --unrestricted --mult=3
+	mkdir -p scan_unrestricted/bend_singlet && cd scan_unrestricted/bend_singlet && python ../../${ANALYSIS_DIR}/generate_steps.py bend  --stepsize=0.05 --stepmin=-1 --stepmax=80  --unrestricted --mult=3
