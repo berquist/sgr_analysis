@@ -210,14 +210,17 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
 
     num_plot_lines = len(methods)
 
+    # Sort by increasing RI-MP2/cc-pVTZ frequency.
+    idxsort = np.argsort(frequencies_d['ri-mp2']['cc-pvtz'][n_qm][n_mm])
+
     for basis_set in basis_sets:
         for idx, method in enumerate(methods):
 
-            pairs = sorted(zip(snapnums_d[method][basis_set][n_qm][n_mm],
-                               frequencies_d[method][basis_set][n_qm][n_mm]),
-                           key=lambda x: x[1])
-            # snapnums = [x[0] for x in pairs]
-            frequencies = [x[1] for x in pairs]
+            # pairs = sorted(zip(snapnums_d[method][basis_set][n_qm][n_mm],
+            #                    frequencies_d[method][basis_set][n_qm][n_mm]),
+            #                key=lambda x: x[1])
+            # frequencies = [x[1] for x in pairs]
+            frequencies = np.array(frequencies_d[method][basis_set][n_qm][n_mm])[idxsort]
 
             mmin = min(frequencies)
             mmax = max(frequencies)
@@ -347,19 +350,25 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
     # xticks = ax_snapshots_ordered.get_xticks()
     # xticks[0] = 1
     # ax_snapshots_ordered.set_xticks(xticks)
-    ax_snapshots_ordered.set_xticklabels([])
+
+    # This removes all the tick labels. Ticks themselves are turned off later.
+    # ax_snapshots_ordered.set_xticklabels([])
+
+    # Only place ticks + labels at 1 and 100.
+    ticks = (1, 100)
+    ax_snapshots_ordered.set_xticks(ticks)
+    ax_snapshots_ordered.set_xticklabels(ticks)
 
     ax_snapshots_ordered.legend(fancybox=True,
               loc='best',
               framealpha=0.50,
               fontsize='small')
-    # ax_snapshots_ordered.set_xlabel('snapshot #',
-    #               fontsize='large')
+    ax_snapshots_ordered.set_xlabel('Sorted Geometry #',
+                  fontsize='large')
     ax_snapshots_ordered.set_ylabel(r'$\nu_3$ harmonic frequency (cm$^{-1}$)',
                                     fontsize='large')
     ax_snapshots_ordered.tick_params(direction='out',
-                                     top='off',
-                                     bottom='off')
+                                     top='off')
     filename = 'snapshots_ordered_{}QM_{}MM.pdf'.format(n_qm, n_mm)
     fig_snapshots_ordered.savefig(filename, bbox_inches='tight')
     print('Saving {}'.format(filename))
