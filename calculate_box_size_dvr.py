@@ -11,7 +11,7 @@ import scripts.periodic_table as pt
 from mbe.examples.droplet import \
     (determine_fragment_grouping, make_fragments_from_grouping,
      distance_atomic_shortest, distance_atomic_longest,
-     distance_twopoint)
+     distance_twopoint, fragment_centerofmass)
 
 def parse_molecule_from_inputfile(inputfilename):
     all_symbols = []
@@ -34,17 +34,6 @@ def parse_molecule_from_inputfile(inputfilename):
     return all_symbols, all_coords
 
 
-def fragment_centerofmass(fragment):
-    """Calculate the center of mass (COM) of a fragment."""
-    masses = np.array([pt.Mass[element] for element in fragment.atoms])
-    mass_sum = np.sum(masses)
-    coords = np.array(fragment.coords)
-    COMx = np.sum(coords[:, 0] * masses) / mass_sum
-    COMy = np.sum(coords[:, 1] * masses) / mass_sum
-    COMz = np.sum(coords[:, 2] * masses) / mass_sum
-    return np.array([COMx, COMy, COMz])
-
-
 def distance_point_1_furthest_atom_2(point, fragment2):
     """Return the largest distance between a given point and all the atoms
     in a given fragment.
@@ -55,8 +44,8 @@ def distance_point_1_furthest_atom_2(point, fragment2):
 
 if __name__ == '__main__':
 
-    find_output = sp.check_output('find . -name "*.in"', shell=True).decode()
-    inputfilenames = find_output.splitlines()
+    find_output = sp.check_output('find . -wholename "*Snap*.in"', shell=True).decode()
+    inputfilenames = sorted(find_output.splitlines())
 
     possible_n_qm = list(range(2, 6 + 1))
     n_qm_to_distance_from_COM_COM = {n_qm: [] for n_qm in possible_n_qm}
@@ -64,6 +53,7 @@ if __name__ == '__main__':
     n_qm_to_distance_from_COM_COM_anion = {n_qm: [] for n_qm in possible_n_qm}
 
     for inputfilename in inputfilenames:
+        print(inputfilename)
         elements, coords = parse_molecule_from_inputfile(inputfilename)
         assert elements[:3] == ['C', 'O', 'O']
         grouping_anions, grouping_cations, grouping_CO2 = determine_fragment_grouping(elements)
@@ -76,7 +66,7 @@ if __name__ == '__main__':
         fragment_CO2 = fragment_CO2[0]
         # fragment_CO2 = fragments[0]
         n_qm = len(fragments[1:]) // 2
-        print(inputfilename, n_qm)
+        print(n_qm)
         max_distance_from_COM_COM = -1.0e30
         max_distance_from_COM_COM_cation = -1.0e30
         max_distance_from_COM_COM_anion = -1.0e30
