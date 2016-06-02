@@ -12,18 +12,18 @@ from mbe.xyz_operations import read_xyz
 
 from mbe.examples.droplet import \
     (determine_fragment_grouping, make_fragments_from_grouping,
-     fragment_centerofmass,
-     get_n_closest_fragments, distance_twopoint)
+     distance_twopoint, fragment_centerofmass,
+     get_n_closest_fragments)
 
 
 if __name__ == '__main__':
 
     find_output = sp.check_output('find /home/eric/Chemistry/calc.sgr/paper_02_CD_SC/NewXYZFiles/ -name "*.xyz" | sort', shell=True).decode()
-    xyzfilenames = find_output.splitlines()
+    xyzfilenames = sorted(find_output.splitlines())
     dim = 1001
     assert len(xyzfilenames) == dim
 
-    possible_n_qm = list(range(1, 6 + 1))
+    possible_n_qm = list(range(1, 64 + 1))
     dropnums = {n_qm: [] for n_qm in possible_n_qm}
     n_qm_to_distance_from_COM_COM_combined = {n_qm: [] for n_qm in possible_n_qm}
     n_qm_to_distance_from_COM_COM_cation = {n_qm: [] for n_qm in possible_n_qm}
