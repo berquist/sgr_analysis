@@ -355,7 +355,12 @@ def analysis_all_methods_all_basis_sets(numbins, n_qm=0, n_mm=0):
     # ax_snapshots_ordered.set_xticklabels([])
 
     # Only place ticks + labels at 1 and 100.
-    ticks = (1, 100)
+    # ticks = (1, 100)
+    start = 0
+    stop = 1000
+    step = 100
+    ticks = list(range(start, stop + step, step))
+    ticks[0] = 1
     ax_snapshots_ordered.set_xticks(ticks)
     ax_snapshots_ordered.set_xticklabels(ticks)
 
