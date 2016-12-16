@@ -54,7 +54,7 @@ def rename_step_files_eric(filenames):
 
 if __name__ == "__main__":
 
-    root_directory = "/home/eric/Chemistry/calc.sgr/droplets/clyde_histogram/freq_dvr_no_almo_0qm/Snap1"
+    root_directory = "/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/clyde_histogram/freq_dvr_no_almo_0qm/Snap1"
 
     # filenames = sorted(glob(os.path.join(root_directory, "step*")))
     # rename_step_files_eric(filenames)

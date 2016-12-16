@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # For dictionary access:
     # n_qm, then n_mm
 
-    snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_3qm")
+    snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/inputs_freq/representative_snapshots_3qm")
 
     z3_sn, z3_f = sort(3, 0, snapnums_frequencies_d, frequencies_CO2_d, snapnums)
     z2_sn, z2_f = sort(2, 0, snapnums_frequencies_d, frequencies_CO2_d, snapnums)

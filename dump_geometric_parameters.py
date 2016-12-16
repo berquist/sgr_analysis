@@ -108,7 +108,7 @@ def dump(path, logfilename=sys.stdout, do_clyde_sort=False):
 if __name__ == "__main__":
 
     paths = (
-        ("/home/eric/Chemistry/calc.sgr/droplets/xyz", False),
+        ("/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/NewXYZFiles", False),
         ("/home/eric/Dropbox/SharedwPitt/NewXYZFiles", True),
         ("/home/eric/Desktop/FullBox", True),
         ("/home/eric/Chemistry/calc.sgr/incorrect/droplets_in_box/FullBox", True),

@@ -768,7 +768,7 @@ if __name__ == '__main__':
 
     # Read in the most "restrictive" set of snapshot numbers; this
     # will let us compare sets of equal size.
-    snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_3qm")
+    snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/inputs_freq/representative_snapshots_3qm")
     filter_snapshots(snapnums, snapnums_frequencies_d, frequencies_CO2_d)
 
     do_result_convergence_plots(frequencies_CO2_d,

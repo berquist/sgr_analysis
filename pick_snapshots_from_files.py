@@ -11,7 +11,7 @@ n_qm_vals = (1, 2, 3)
 binned_snapnums = dict()
 for n_qm in n_qm_vals:
     binned_snapnums[n_qm] = dict()
-    binned_snapnums_filename = '/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_{}qm'.format(n_qm)
+    binned_snapnums_filename = '/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/inputs_freq/representative_snapshots_{}qm'.format(n_qm)
     with open(binned_snapnums_filename) as fh:
         binned_snapnums_file_split = fh.read().split('#')[1:]
     for binstring in binned_snapnums_file_split:
@@ -20,7 +20,7 @@ for n_qm in n_qm_vals:
         snapnums = chomp[2:]
         binned_snapnums[n_qm][binnum] = snapnums
 
-dir_root = '/home/eric/Chemistry/calc.sgr/droplets'
+dir_root = '/home/eric/Chemistry/calc.sgr/paper_02_CD_SC'
 for input_type in ('eda', 'eda_covp', 'freq_noCT'):
     dir_input = 'inputs_{}'.format(input_type)
     dir_input_full = os.path.join(dir_root, dir_input)

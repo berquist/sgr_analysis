@@ -32,7 +32,7 @@ def getargs():
     parser.add_argument('--do-file-operations', action='store_true')
 
     parser.add_argument('--dir-droplets',
-                        default='/home/eric/Chemistry/calc.sgr/droplets/inputs_freq',
+                        default='/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/inputs_freq',
                         help="""This is the root directory to look for all files.""")
 
     args = parser.parse_args()

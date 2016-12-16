@@ -63,7 +63,7 @@ if __name__ == '__main__':
     # 4. n_qm
     # 5. n_mm
 
-    BASEDIR = "/home/eric/Chemistry/calc.sgr/droplets/snapshot_method_dependence_4fs"
+    BASEDIR = "/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/snapshot_method_dependence_4fs"
 
     if args.file_operation == "save":
         print("Trying to find output files...")

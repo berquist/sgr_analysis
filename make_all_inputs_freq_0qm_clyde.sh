@@ -12,7 +12,7 @@ make_inputs() {
     # So our work isn't overwritten on accident.
     cd "${inputdir}" || return
 
-    genfiles="$(find /home/eric/Chemistry/calc.sgr/droplets/qchem_molecule_external_charges_stubs_supersystem -type f -name "drop_*_0qm_*mm")"
+    genfiles="$(find /home/eric/Chemistry/calc.sgr/paper_02_CD_SC/qchem_molecule_external_charges_stubs_supersystem -type f -name "drop_*_0qm_*mm")"
 
     for genfile in ${genfiles[@]}; do
         genfilebase=$(basename "${genfile}")

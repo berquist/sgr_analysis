@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     if args.file_operation == "save":
         print("Trying to find output files...")
-        basedir = "/home/eric/Chemistry/calc.sgr/droplets/snapshot_method_dependence"
+        basedir = "/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/snapshot_method_dependence"
         outputfiles = dict()
         for method in methods:
             outputfiles[method] = dict()

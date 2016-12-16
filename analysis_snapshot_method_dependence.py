@@ -249,7 +249,7 @@ if __name__ == '__main__':
 
     ##################################################
 
-    snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/droplets/inputs_freq/representative_snapshots_3qm")
+    snapnums = read_snapshot_file("/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/inputs_freq/representative_snapshots_3qm")
     print('snapshot numbers:', snapnums)
     for snapnum in snapnums:
         plot_single_snapshot_frequencies(snapnum, snapnums_f, frequencies)

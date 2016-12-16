@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    directory_parent = "/home/eric/Chemistry/calc.sgr/droplets/scan"
+    directory_parent = "/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/scan"
     directory_stretch_1_r = os.path.join(directory_parent, "scan_restricted/scan_stretch_1_6-311++gdp")
     directory_stretch_2_r = os.path.join(directory_parent, "scan_restricted/scan_stretch_2_6-311++gdp")
     directory_bend_r = os.path.join(directory_parent, "scan_unrestricted/scan_bend_6-311++gdp")
