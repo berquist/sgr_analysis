@@ -3,7 +3,7 @@
 ANALYSIS_DIR=../analysis
 
 parse:
-	python ${ANALYSIS_DIR}/parse_outputs.py save save --parse-frequencies --parse-dipoles
+	python ${ANALYSIS_DIR}/parse_outputs.py save save --parse-frequencies --parse-dipoles --parse-geometries
 
 analysis:
 	python ${ANALYSIS_DIR}/analysis_histograms.py single --n_qm=2 --n_mm=254 --numbins=5

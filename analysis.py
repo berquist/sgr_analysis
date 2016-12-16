@@ -23,6 +23,7 @@ from analysis_utils import mangle_dict_keys
 from analysis_utils import pprint_linregress
 from analysis_utils import read_snapshot_file
 from analysis_utils import slice
+from model_hamiltonian_frequencies import distance
 
 
 def condon():
@@ -44,16 +45,38 @@ def condon():
         'rsq',
     ])
 
+    list_l12 = []
+    geometries = geometries_d[0][0]
+    C, O1, O2 = 0, 1, 2
+    for geometry in geometries:
+        d_C_O1 = distance(geometry[C], geometry[O1])
+        d_C_O2 = distance(geometry[C], geometry[O2])
+        d_O1_O2 = distance(geometry[O1], geometry[O2])
+        bond_sum = d_C_O1 + d_C_O2
+        # bond_difference = abs(d_C_O1 - d_C_O2)
+        list_l12.append(bond_sum)
+    list_l12 = np.array(list_l12)
+
     for n_qm in sorted(frequencies_CO2_d):
         print("Forming Condon approximation plot for {}".format(labels[n_qm]))
         frequencies_single_qm_all_mm = []
         intensities_single_qm_all_mm = []
+        # This is only necessary to get this mess to work, so the list
+        # lengths are correct. The CO2 geometry will always be the
+        # same.
+        geometries_single_qm_all_mm = []
         for n_mm in possible_keys:
             f = frequencies_CO2_d[n_qm][n_mm]
             i = intensities_CO2_d[n_qm][n_mm]
-            assert len(f) == len(i)
+            s = snapnums_frequencies_d[n_qm][n_mm]
+            # filter the geometry results based on the current
+            # snapshots
+            indices = [(snapnum - 1) for snapnum in s]
+            g = list_l12[indices]
+            assert len(f) == len(i) == len(g)
             frequencies_single_qm_all_mm.extend(f)
             intensities_single_qm_all_mm.extend(i)
+            geometries_single_qm_all_mm.extend(g)
             frequencies_all.extend(f)
             intensities_all.extend(i)
             print('{} QM/{} MM'.format(n_qm, n_mm))
@@ -63,7 +86,12 @@ def condon():
             except:
                 pass
         assert len(frequencies_single_qm_all_mm) == len(intensities_single_qm_all_mm)
-        ax.scatter(frequencies_single_qm_all_mm,
+        # ax.scatter(frequencies_single_qm_all_mm,
+        #            intensities_single_qm_all_mm,
+        #            marker=markers[n_qm],
+        #            label=labels[n_qm],
+        #            color=colors[n_qm])
+        ax.scatter(geometries_single_qm_all_mm,
                    intensities_single_qm_all_mm,
                    marker=markers[n_qm],
                    label=labels[n_qm],
@@ -583,25 +611,31 @@ if __name__ == '__main__':
         intensities_noCT_CO2_d = pickle.load(picklefile)
     with open('dipoles.pypickle', 'rb') as picklefile:
         dipoles_d = pickle.load(picklefile)
+    with open('geometries.pypickle', 'rb') as picklefile:
+        geometries_d = pickle.load(picklefile)
     with open('snapnums_frequencies.pypickle', 'rb') as picklefile:
         snapnums_frequencies_d = pickle.load(picklefile)
     with open('snapnums_frequencies_noCT.pypickle', 'rb') as picklefile:
         snapnums_frequencies_noCT_d = pickle.load(picklefile)
     with open('snapnums_dipoles.pypickle', 'rb') as picklefile:
         snapnums_dipoles_d = pickle.load(picklefile)
+    with open('snapnums_geometries.pypickle', 'rb') as picklefile:
+        snapnums_geometries_d = pickle.load(picklefile)
 
     # Until I come up with a better idea, here's where I mangle some
     # of the keys (253, 254, 255, 256) into 256.
 
-    # Make a copy beforehand...
+    # Make a copy beforehand, just in case...
     frequencies_CO2_d_unmangled = deepcopy(frequencies_CO2_d)
     intensities_CO2_d_unmangled = deepcopy(intensities_CO2_d)
     frequencies_noCT_CO2_d_unmangled = deepcopy(frequencies_noCT_CO2_d)
     intensities_noCT_CO2_d_unmangled = deepcopy(intensities_noCT_CO2_d)
     dipoles_d_unmangled = deepcopy(dipoles_d)
+    geometries_d_unmangled = deepcopy(geometries_d)
     snapnums_frequencies_d_unmangled = deepcopy(snapnums_frequencies_d)
     snapnums_frequencies_noCT_d_unmangled = deepcopy(snapnums_frequencies_noCT_d)
     snapnums_dipoles_d_unmangled = deepcopy(snapnums_dipoles_d)
+    snapnums_geometries_d_unmangled = deepcopy(snapnums_geometries_d)
 
     # Do the mangling.
     frequencies_CO2_d = mangle_dict_keys(frequencies_CO2_d)
@@ -609,6 +643,7 @@ if __name__ == '__main__':
     frequencies_noCT_CO2_d = mangle_dict_keys(frequencies_noCT_CO2_d)
     intensities_noCT_CO2_d = mangle_dict_keys(intensities_noCT_CO2_d)
     dipoles_d = mangle_dict_keys(dipoles_d)
+    geometries_d = mangle_dict_keys(geometries_d)
     snapnums_frequencies_d = mangle_dict_keys(snapnums_frequencies_d)
     snapnums_frequencies_noCT_d = mangle_dict_keys(snapnums_frequencies_noCT_d)
     snapnums_dipoles_d = mangle_dict_keys(snapnums_dipoles_d)

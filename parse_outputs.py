@@ -252,15 +252,18 @@ if __name__ == '__main__':
 
         if args.parse_geometries:
             print("Parsing CO2 geometries...")
-            geometries_0qm, snapnums_geometries_0qm = get_geometries_d(filenames_freq_0qm)
-            geometries_rms_d = {
+            # The CO2 geometries are identical acros all possible # of
+            # MM pairs. Remove everything except 0/0.
+            filenames_geo_0qm = {0: filenames_freq_0qm[0]}
+            geometries_0qm, snapnums_geometries_0qm = get_geometries_d(filenames_geo_0qm)
+            geometries_d = {
                 0: geometries_0qm,
             }
             snapnums_geometries_d = {
                 0: snapnums_geometries_0qm,
             }
             with open('geometries.pypickle', 'wb') as picklefile:
-                pickle.dump(geometries_rms_d, picklefile)
+                pickle.dump(geometries_d, picklefile)
             with open('snapnums_geometries.pypickle', 'wb') as picklefile:
                 pickle.dump(snapnums_geometries_d, picklefile)
 

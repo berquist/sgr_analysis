@@ -237,6 +237,7 @@ def get_geometries(outputfilenames):
         geometry_whole = data.atomcoords[0]
         start_index = len(data.atomnos) - 3
         geometry_CO2 = geometry_whole[start_index:]
+        assert len(geometry_CO2) == 3
         CO2_geometries.append(geometry_CO2)
         snapnum = int(re.search(r'drop_(\d+)', outputfilename).groups()[0])
         snapnums.append(snapnum)
@@ -345,6 +346,8 @@ def get_geometries_d(filename_dict):
 
 def get_single_snapshot_results(snapnum, snapnums_dict, results_dict):
 
+    # This is the dictionary that will contain the result for all
+    # possible QM and MM combinations for only one structure.
     snap_results_dict = dict()
 
     for n_qm in sorted(results_dict.keys()):

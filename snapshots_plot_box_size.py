@@ -10,7 +10,7 @@ import numpy as np
 
 if __name__ == '__main__':
 
-    possible_n_qm = list(range(1, 64 + 1))
+    possible_n_qm = list(range(1, 10 + 1))
     dropnums = np.arange(1, 1001 + 1)
     distances = dict()
 
