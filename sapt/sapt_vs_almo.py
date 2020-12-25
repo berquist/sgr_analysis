@@ -41,7 +41,6 @@ if __name__ == '__main__':
     filenames_wb97mv_dunning_nocp = sorted(glob(root_dir + '*wb97m-v_cc-pvtz_nocp.out'))
 
     filenames_sapt = sorted(glob(root_dir_sapt + '*.out'))
-
     filenames_paper1 = sorted(glob(root_dir_paper1 + '*.out'))
 
     batches = (
