@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import os
 
 import numpy as np
@@ -9,7 +6,7 @@ from glob import glob
 
 from cclib.parser import ccopen
 
-from model_hamiltonian_frequencies import (distance, bond_angle)
+from sgr_analysis.model_hamiltonian_frequencies import (distance, bond_angle)
 
 
 def pad_left_zeros(num, maxwidth):

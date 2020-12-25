@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """stats.py: Print bin statistics.
 
 This script should be run from within each 'inputs_freq_{n_qm}'
@@ -12,9 +10,7 @@ import os
 import numpy as np
 import scipy.stats as sps
 
-from analysis_utils import filter_outputfiles
-from analysis_utils import get_CO2_frequencies
-from analysis_utils import get_outputfiles_from_path
+from sgr_analysis.analysis_utils import filter_outputfiles, get_CO2_frequencies, get_outputfiles_from_path
 
 
 if __name__ == "__main__":

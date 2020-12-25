@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import csv
 import math
 import pickle
@@ -8,9 +5,9 @@ import pickle
 import numpy as np
 import scipy.stats as sps
 
-from parse_outputs_snapshot_method_dependence import \
+from sgr_analysis.parse_outputs_snapshot_method_dependence import \
     (methods, basis_sets)
-from analysis_snapshot_method_dependence import \
+from sgr_analysis.analysis_snapshot_method_dependence import \
     (linestyles, colors)
 
 import matplotlib as mpl

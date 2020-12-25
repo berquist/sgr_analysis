@@ -1,14 +1,11 @@
-#!/usr/bin/env python3
-
-
 import pickle
 
 import numpy as np
 
 from scipy.stats import linregress
 
-from analysis_utils import mangle_dict_keys
-from model_hamiltonian_frequencies import (distance, bond_angle)
+from sgr_analysis.analysis_utils import mangle_dict_keys
+from sgr_analysis.model_hamiltonian_frequencies import (distance, bond_angle)
 
 import matplotlib as mpl
 mpl.use('Agg')

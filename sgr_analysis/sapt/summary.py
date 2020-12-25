@@ -4,10 +4,9 @@
 import itertools
 from collections import OrderedDict
 
-import numpy as np
 import pandas as pd
 
-from helpers import df_weighted_average
+from sgr_analysis.sapt.helpers import df_weighted_average
 
 method_map = OrderedDict([
     ('hf', 'HF'),

@@ -14,10 +14,9 @@ from glob import glob
 import os.path
 
 import numpy as np
-import pandas as pd
 
-from helpers import (bin_to_weight_map, read_psi4_sapt0,
-                     read_qchem_eda, snapnum_to_bin_map)
+from sgr_analysis.sapt.helpers import (bin_to_weight_map, read_psi4_sapt0,
+                                       read_qchem_eda, snapnum_to_bin_map)
 
 if __name__ == '__main__':
 

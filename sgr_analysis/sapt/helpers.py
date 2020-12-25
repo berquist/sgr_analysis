@@ -10,7 +10,7 @@ import pandas as pd
 from pandas.util.testing import assert_frame_equal
 import scipy.stats as sps
 
-from scripts.utils import make_file_iterator
+from sgr_analysis.analysis_utils import make_file_iterator
 
 
 KJ_TO_KCAL = 4.184

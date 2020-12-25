@@ -3,7 +3,7 @@ import subprocess as sp
 
 import numpy as np
 
-from scripts.utils import make_file_iterator
+from sgr_analysis.analysis_utils import make_file_iterator
 import scripts.periodic_table as pt
 
 from mbe.examples.droplet import \

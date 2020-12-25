@@ -1,16 +1,12 @@
-
-#!/usr/bin/env python3
-
 """parse_outputs.py: Parse outputfiles for certain values, like
 frequencies and dipole moments, and store them in pickled
 dictionaries.
 """
 
-
 import os
 import pickle
 
-from analysis_utils import \
+from sgr_analysis.analysis_utils import \
     (get_outputfiles_from_path, filter_n_mm_into_dict, get_CO2_frequencies_d,
      get_dipoles_d, get_gradients_d, get_geometries_d)
 

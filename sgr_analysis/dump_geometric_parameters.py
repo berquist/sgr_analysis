@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import sys
 import os.path
 
@@ -9,7 +6,7 @@ import numpy as np
 import numpy.linalg as npl
 
 from mbe.xyz_operations import read_xyz
-from analysis_utils import get_outputfiles_from_path
+from sgr_analysis.analysis_utils import get_outputfiles_from_path
 
 def distance(icoords, jcoords):
     """Calculate the distance between two 3-vectors (i,j)."""

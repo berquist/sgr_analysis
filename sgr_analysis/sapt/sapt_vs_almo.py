@@ -2,17 +2,16 @@
 interaction energy components, writing to a CSV file."""
 
 
-from collections import OrderedDict
 from glob import glob
 import csv
 import os.path
 
 import numpy as np
 
-from helpers import (bin_to_weight_map, read_psi4_sapt0,
-                     read_qchem_eda, snapnum_to_bin_map)
+from sgr_analysis.sapt.helpers import (bin_to_weight_map, read_psi4_sapt0,
+                                       read_qchem_eda, snapnum_to_bin_map)
 
-from summary import method_basis_outer_product
+from sgr_analysis.sapt.summary import method_basis_outer_product
 
 
 if __name__ == '__main__':

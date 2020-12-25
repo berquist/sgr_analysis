@@ -1,12 +1,8 @@
-#!/usr/bin/env python3
-
-
 import pickle
 
 import numpy as np
 
-from analysis_utils import mangle_dict_keys
-from analysis_utils import read_snapshot_file
+from sgr_analysis.analysis_utils import mangle_dict_keys, read_snapshot_file
 
 
 def sort(n_qm, n_mm, snapnums_d, results_d, filtered_snapnums):
@@ -76,7 +72,7 @@ if __name__ == "__main__":
         frequencies = [z0_f[i], z1_f[i], z2_f[i], z3_f[i]]
         ax.plot(x, frequencies, marker='o', label=snapnum)
 
-    fig.savefig('plot_snapshots2.pdf'.format(snapnum), bbox_inches='tight')
+    fig.savefig('plot_snapshots2.pdf', bbox_inches='tight')
 
     # filter the results so only those appears that are from the
     # snapshot numbers we've read in

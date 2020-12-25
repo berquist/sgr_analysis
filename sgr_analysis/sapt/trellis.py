@@ -4,7 +4,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
-from helpers import fit_line
+from sgr_analysis.sapt.helpers import fit_line
 
 
 

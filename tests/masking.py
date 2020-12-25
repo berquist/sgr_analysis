@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import numpy as np
 
 y = np.array([2, 1, 5, 2])

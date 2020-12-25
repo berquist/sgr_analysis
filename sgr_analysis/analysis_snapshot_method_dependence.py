@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import pickle
 
 from collections import OrderedDict
@@ -8,10 +5,10 @@ from collections import OrderedDict
 import numpy as np
 import numpy.linalg as npl
 
-from analysis_utils import read_snapshot_file
+from sgr_analysis.analysis_utils import read_snapshot_file
 
-from parse_outputs_snapshot_method_dependence import methods
-from parse_outputs_snapshot_method_dependence import basis_sets
+from sgr_analysis.parse_outputs_snapshot_method_dependence import methods
+from sgr_analysis.parse_outputs_snapshot_method_dependence import basis_sets
 
 import matplotlib as mpl
 mpl.use("Agg")

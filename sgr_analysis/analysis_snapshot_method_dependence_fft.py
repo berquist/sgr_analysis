@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """analysis_snapshot_method_dependence_fft.py: Plot the actual
 vibrational spectra of parsed MD snapshots separated by 4 fs (to give
 a spectral width of ~8333 cm^-1) by taking the FFT of the dipole
@@ -26,7 +24,7 @@ import scipy.stats as sps
 # from parse_outputs_snapshot_method_dependence_4fs import \
 #     (methods, basis_sets)
 
-from analysis_histograms import \
+from sgr_analysis.analysis_histograms import \
     (make_bin_edges, norm_pdf)
 
 import matplotlib as mpl

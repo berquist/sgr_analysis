@@ -7,7 +7,7 @@ mpl.use('Agg')
 mpl.rc('text', usetex=True)
 import matplotlib.pyplot as plt
 
-from helpers import fit_line
+from sgr_analysis.sapt.helpers import fit_line
 
 # CP correction for geom/hessian
 data = {

@@ -1,15 +1,9 @@
-#!/usr/bin/env python3
-
-
 import os
 import pickle
 
 from collections import OrderedDict
 
-from analysis_utils import get_CO2_frequencies_d
-from analysis_utils import get_dipoles_d
-from analysis_utils import get_outputfiles_from_path
-from analysis_utils import filter_n_mm_into_dict
+from sgr_analysis.analysis_utils import get_CO2_frequencies_d, get_dipoles_d, get_outputfiles_from_path, filter_n_mm_into_dict
 
 methods = OrderedDict([
     # ('blyp', 'BLYP'),

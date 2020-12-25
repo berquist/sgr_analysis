@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-
 """analysis.py: Where most of the analysis for the 'droplet' snapshots
 is.
 """
-
 
 import pickle
 import csv
@@ -12,16 +9,10 @@ from copy import deepcopy
 from functools import partial
 
 import numpy as np
-import numpy.linalg as npl
 import scipy.stats as sps
 
-from analysis_utils import filter_snapshots
-from analysis_utils import get_single_snapshot_results
-from analysis_utils import mangle_dict_keys
-from analysis_utils import pprint_linregress
-from analysis_utils import read_snapshot_file
-from analysis_utils import slice
-from model_hamiltonian_frequencies import distance
+from sgr_analysis.analysis_utils import filter_snapshots, get_single_snapshot_results, mangle_dict_keys, pprint_linregress, read_snapshot_file, slice
+from sgr_analysis.model_hamiltonian_frequencies import distance
 
 
 def condon():

@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-
-
 import sys
 import pickle
 from glob import glob
@@ -9,9 +6,9 @@ import os
 import numpy as np
 import scipy.stats as sps
 
-from parse_outputs_snapshot_method_dependence import \
+from sgr_analysis.parse_outputs_snapshot_method_dependence import \
     (methods, basis_sets)
-from analysis_histograms import \
+from sgr_analysis.analysis_histograms import \
     (make_bin_edges, bin_snapshots, make_bin_dictionary,
      map_n_qm_to_num_snapshots)
 

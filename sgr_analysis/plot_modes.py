@@ -1,15 +1,12 @@
-#!/usr/bin/env python3
-
-
 import os
 
 from glob import glob
 
 from cclib.parser import ccopen
 
-from model_hamiltonian_frequencies import \
+from sgr_analysis.model_hamiltonian_frequencies import \
     (distance, bond_angle)
-from analysis_utils import pad_left_zeros
+from sgr_analysis.analysis_utils import pad_left_zeros
 
 
 

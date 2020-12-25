@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import numpy as np
 
 x = np.array([0.2, 6.4, 3.0, 1.6, 10.0])

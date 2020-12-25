@@ -11,7 +11,15 @@ import scipy.stats as sps
 
 from cclib.parser import ccopen
 
-from scripts.find_CO2_frequencies import find_CO2_mode_indices
+from sgr_analysis.find_CO2_frequencies import find_CO2_mode_indices
+
+
+def make_file_iterator(filename):
+    """Return an iterator over the contents of the given file name."""
+    # pylint: disable=C0103
+    with open(filename) as f:
+        contents = f.read()
+    return iter(contents.splitlines())
 
 
 def slice(x, start, end):

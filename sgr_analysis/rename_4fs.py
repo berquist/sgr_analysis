@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from glob import glob
 import os
 from mbe.utils import pad_left_zeros

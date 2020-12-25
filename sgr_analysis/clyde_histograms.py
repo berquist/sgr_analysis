@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-
 import numpy as np
 import scipy.stats as sps
 
-from analysis_histograms import \
+from sgr_analysis.analysis_histograms import \
     (make_bin_edges, norm_pdf)
 
 import matplotlib as mpl
