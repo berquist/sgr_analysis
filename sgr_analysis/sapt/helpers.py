@@ -169,6 +169,110 @@ def read_qchem_eda_v1(filename: str, is_cp: bool = False):
     return almo_data_snap
 
 
+def read_qchem_eda_v2(filename: str):
+    """Units of returned values: kcal/mol"""
+    almo_data = dict()
+    fh = open(filename)
+    line = next(fh)
+    while "Results of EDA2" not in line:
+        line = next(fh)
+    line = next(fh)
+    assert line.strip() == "================================"
+    line = next(fh)
+    assert line.strip() == "Basic EDA Quantities"
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    assert line.strip() == "Fragment Energies (Ha):"
+    line = next(fh)
+    while line.strip() != "--------------------":
+        # Do nothing with the fragment energies for now
+        line = next(fh)
+    line = next(fh)
+    e_prp = float(line.split()[3])
+    almo_data["prp"] = e_prp
+    line = next(fh)
+    e_sol = float(line.split()[3])
+    almo_data["sol"] = e_sol
+    line = next(fh)
+    e_frz = float(line.split()[3])
+    almo_data["frz"] = e_frz
+    line = next(fh)
+    e_pol = float(line.split()[3])
+    almo_data["pol"] = e_pol
+    line = next(fh)
+    e_vct = float(line.split()[3])
+    almo_data["vct"] = e_vct
+    line = next(fh)
+    e_int = float(line.split()[3])
+    almo_data["int"] = e_int
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    assert line.strip() == ""
+    line = next(fh)
+    assert line.strip() == ""
+    line = next(fh)
+    assert line.strip() == "Decomposition of frozen interaction energy"
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    assert line.strip() == "Orthogonal Frozen Decomposition:"
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    e_elec = float(line.split()[4])
+    almo_data["elec"] = e_elec
+    line = next(fh)
+    e_pauli = float(line.split()[4])
+    almo_data["pauli"] = e_pauli
+    line = next(fh)
+    # e_disp = float(line.split()[4])
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    assert line.strip() == "Classical Frozen Decomposition:"
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    e_cls_elec = float(line.split()[5])
+    almo_data["cls_elec"] = e_cls_elec
+    line = next(fh)
+    e_mod_pauli = float(line.split()[5])
+    almo_data["mod_pauli"] = e_mod_pauli
+    line = next(fh)
+    e_disp = float(line.split()[4])
+    almo_data["disp"] = e_disp
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    assert line.strip() == ""
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    assert line.strip() == "Perturbative CT Analysis:"
+    line = next(fh)
+    assert line.strip() == "--------------------"
+    line = next(fh)
+    e_pct = float(line.split()[3])
+    almo_data["pct"] = e_pct
+    line = next(fh)
+    e_HO = float(line.split()[3])
+    almo_data["HO"] = e_HO
+    line = next(fh)
+    assert line.strip() == "---------------"
+    # TODO PCT Energy lowering
+    # TODO PCT Charge displacement
+    fh.close()
+    for k in almo_data:
+        almo_data[k] /= KJ_TO_KCAL
+    return almo_data
+
+
 def make_snapnum_to_bin_map():
     snapshots_filename = '/home/eric/Chemistry/calc.sgr/paper_02_CD_SC/inputs_freq/representative_snapshots_1qm'
     snapnum_to_bin_map = dict()
