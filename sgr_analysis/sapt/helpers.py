@@ -203,7 +203,8 @@ SAPT_HEADERS = SAPT_HEADERS_MONOMER + SAPT_HEADERS_DIMER
 
 SAPT_BASES = ('monomer', 'dimer')
 
-def read_psi4_sapt_section(fi, thresh=1.0e-7):
+def read_psi4_sapt_section(fi, pos: int = 1, calculation_thresh: float = 1.0e-7):
+    """All returned values have units of kcal/mol."""
     sapt_single_basis_data = dict()
 
     line = ''
@@ -213,16 +214,16 @@ def read_psi4_sapt_section(fi, thresh=1.0e-7):
     assert '------' in line
     line = next(fi)
     assert 'Electrostatics' in line
-    val_kcal_mol_electrostatics = float(re_number.findall(line)[1])
-    sapt_single_basis_data['el'] = val_kcal_mol_electrostatics
+    val_electrostatics = float(re_number.findall(line)[pos])
+    sapt_single_basis_data['el'] = val_electrostatics
     line = next(fi)
     assert 'Elst10,r' in line
     line = next(fi)
     assert line.strip() == ''
     line = next(fi)
     assert 'Exchange' in line
-    val_kcal_mol_exchange = float(re_number.findall(line)[1])
-    sapt_single_basis_data['exch'] = val_kcal_mol_exchange
+    val_exchange = float(re_number.findall(line)[pos])
+    sapt_single_basis_data['exch'] = val_exchange
     line = next(fi)
     assert 'Exch10' in line
     line = next(fi)
@@ -233,69 +234,61 @@ def read_psi4_sapt_section(fi, thresh=1.0e-7):
     assert 'Induction' in line
     line = next(fi)
     assert 'Ind20,r' in line
-    val_kcal_mol_induction = float(re_number.findall(line)[1])
-    sapt_single_basis_data['ind'] = val_kcal_mol_induction
+    val_induction = float(re_number.findall(line)[pos])
+    sapt_single_basis_data['ind'] = val_induction
     line = next(fi)
     assert 'Exch-Ind20,r' in line
-    val_kcal_mol_exchange_induction = float(re_number.findall(line)[1])
-    sapt_single_basis_data['exch-ind'] = val_kcal_mol_exchange_induction
+    val_exchange_induction = float(re_number.findall(line)[pos])
+    sapt_single_basis_data['exch-ind'] = val_exchange_induction
     line = next(fi)
     assert 'delta HF,r (2)' in line
-    val_kcal_mol_induction_delta_hf = float(re_number.findall(line)[1])
-    sapt_single_basis_data['ind_HO'] = val_kcal_mol_induction_delta_hf
+    val_induction_delta_hf = float(re_number.findall(line)[pos])
+    sapt_single_basis_data['ind_HO'] = val_induction_delta_hf
     line = next(fi)
     assert line.strip() == ''
     line = next(fi)
     assert 'Dispersion' in line
     line = next(fi)
     assert 'Disp20' in line
-    val_kcal_mol_dispersion = float(re_number.findall(line)[1])
-    sapt_single_basis_data['disp'] = val_kcal_mol_dispersion
+    val_dispersion = float(re_number.findall(line)[pos])
+    sapt_single_basis_data['disp'] = val_dispersion
     line = next(fi)
     assert 'Exch-Disp20' in line
-    val_kcal_mol_exchange_dispersion = float(re_number.findall(line)[1])
-    sapt_single_basis_data['exch-disp'] = val_kcal_mol_exchange_dispersion
+    val_exchange_dispersion = float(re_number.findall(line)[pos])
+    sapt_single_basis_data['exch-disp'] = val_exchange_dispersion
 
     while 'Total SAPT0' not in line:
         line = next(fi)
-    sapt0_total_kcal_mol_calculated = float(re_number.findall(line)[1])
+    sapt0_total_calculated = float(re_number.findall(line)[pos])
 
-    sapt0_total_kcal_mol = val_kcal_mol_electrostatics + \
-                           val_kcal_mol_exchange + \
-                           val_kcal_mol_induction + \
-                           val_kcal_mol_exchange_induction + \
-                           val_kcal_mol_induction_delta_hf + \
-                           val_kcal_mol_dispersion + \
-                           val_kcal_mol_exchange_dispersion
+    sapt0_total = val_electrostatics + \
+        val_exchange + \
+        val_induction + \
+        val_exchange_induction + \
+        val_induction_delta_hf + \
+        val_dispersion + \
+        val_exchange_dispersion
 
-    # print(abs(sapt0_total_kcal_mol - sapt0_total_kcal_mol_calculated))
-    assert abs(sapt0_total_kcal_mol - sapt0_total_kcal_mol_calculated) < thresh
+    assert abs(sapt0_total - sapt0_total_calculated) < calculation_thresh
 
-    sapt_single_basis_data['total'] = sapt0_total_kcal_mol
+    sapt_single_basis_data['total'] = sapt0_total
 
     return sapt_single_basis_data
 
 
-def read_psi4_sapt0_with_snapnum_and_weight(filename):
-    snapnum_to_bin_map = make_snapnum_to_bin_map()
-    sapt_data = dict()
-    stub = os.path.splitext(os.path.basename(filename))[0]
-    stub_tokens = stub.split('_')
-    snapnum = int(stub_tokens[1])
-    binnum = snapnum_to_bin_map[snapnum]
-    weight = BIN_TO_WEIGHT_MAP[binnum]
-    sapt_data['snapnum'] = snapnum
-    sapt_data['weight'] = weight
+def read_psi4_sapt0(filename: str, pos: int = 1):
+    """All returned values have units of kcal/mol."""
     fi = make_file_iterator(filename)
+    sapt_data = dict()
 
     # Collect both dimer-centered and monomer-centered SAPT basis
     # data.
     for line in fi:
         # Dimer results always come before monomer results.
         if any(sapt_header in line for sapt_header in SAPT_HEADERS_DIMER):
-            sapt_data['dimer'] = read_psi4_sapt_section(fi)
+            sapt_data['dimer'] = read_psi4_sapt_section(fi, pos)
         if any(sapt_header in line for sapt_header in SAPT_HEADERS_MONOMER):
-            sapt_data['monomer'] = read_psi4_sapt_section(fi)
+            sapt_data['monomer'] = read_psi4_sapt_section(fi, pos)
             break
 
     # Finally, check to see if a charge transfer (CT) calculation has
@@ -312,9 +305,21 @@ def read_psi4_sapt0_with_snapnum_and_weight(filename):
             assert 'SAPT Induction (Monomer Basis)' in line
             line = next(fi)
             assert 'SAPT Charge Transfer' in line
-            ct_kcal_mol = float(re_number.findall(line)[1])
-            sapt_data['ct'] = ct_kcal_mol
+            ct = float(re_number.findall(line)[pos])
+            sapt_data['ct'] = ct
 
+    return sapt_data
+
+
+def read_psi4_sapt0_with_snapnum_and_weight(filename):
+    snapnum_to_bin_map = make_snapnum_to_bin_map()
+    stub = os.path.splitext(os.path.basename(filename))[0]
+    stub_tokens = stub.split('_')
+    snapnum = int(stub_tokens[1])
+    binnum = snapnum_to_bin_map[snapnum]
+    sapt_data = read_psi4_sapt0(filename)
+    sapt_data['snapnum'] = snapnum
+    sapt_data['weight'] = BIN_TO_WEIGHT_MAP[binnum]
     return sapt_data
 
 
