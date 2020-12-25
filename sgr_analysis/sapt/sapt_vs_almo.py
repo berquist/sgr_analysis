@@ -9,7 +9,7 @@ import os.path
 import numpy as np
 
 from sgr_analysis.sapt.helpers import (BIN_TO_WEIGHT_MAP, read_psi4_sapt0_with_snapnum_and_weight,
-                                       read_qchem_eda, snapnum_to_bin_map)
+                                       read_qchem_eda_v1, snapnum_to_bin_map)
 
 from sgr_analysis.sapt.summary import method_basis_outer_product
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
             if cp_flag not in almo_data[method]:
                 almo_data[method][cp_flag] = dict()
 
-            almo_data_snap = read_qchem_eda(filename, is_cp=is_cp)
+            almo_data_snap = read_qchem_eda_v1(filename, is_cp=is_cp)
 
             almo_data[method][cp_flag][snapnum] = almo_data_snap
 

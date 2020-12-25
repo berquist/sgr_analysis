@@ -105,7 +105,7 @@ def _add_axis_labels(pg):
     return
 
 
-def read_qchem_eda(filename, is_cp=False):
+def read_qchem_eda_v1(filename: str, is_cp: bool = False):
     """Units of returned values: kcal/mol"""
 
     almo_data_snap = dict()
