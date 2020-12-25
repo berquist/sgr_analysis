@@ -181,10 +181,8 @@ def make_snapnum_to_bin_map():
                 snapnum_to_bin_map[snapnum] = binnum
     return snapnum_to_bin_map
 
-snapnum_to_bin_map = make_snapnum_to_bin_map()
-
 # B3LYP/6-31G(d,p)
-bin_to_weight_map = {
+BIN_TO_WEIGHT_MAP = {
     1: 0.06060606,
     2: 0.24747475,
     3: 0.4010101,
@@ -192,20 +190,20 @@ bin_to_weight_map = {
     5: 0.06464646,
 }
 
-sapt_headers_monomer = [
+SAPT_HEADERS_MONOMER = [
     '//         Monomer Basis SAPT        //',
 ]
 
-sapt_headers_dimer = [
+SAPT_HEADERS_DIMER = [
     '//               SAPT0               //',
     '//          Dimer Basis SAPT         //',
 ]
 
-sapt_headers = sapt_headers_monomer + sapt_headers_dimer
+SAPT_HEADERS = SAPT_HEADERS_MONOMER + SAPT_HEADERS_DIMER
 
-sapt_bases = ('monomer', 'dimer')
+SAPT_BASES = ('monomer', 'dimer')
 
-def read_psi4_sapt_section(fi):
+def read_psi4_sapt_section(fi, thresh=1.0e-7):
     sapt_single_basis_data = dict()
 
     line = ''
@@ -271,20 +269,21 @@ def read_psi4_sapt_section(fi):
                            val_kcal_mol_exchange_dispersion
 
     # print(abs(sapt0_total_kcal_mol - sapt0_total_kcal_mol_calculated))
-    assert abs(sapt0_total_kcal_mol - sapt0_total_kcal_mol_calculated) < 1.0e-7
+    assert abs(sapt0_total_kcal_mol - sapt0_total_kcal_mol_calculated) < thresh
 
     sapt_single_basis_data['total'] = sapt0_total_kcal_mol
 
     return sapt_single_basis_data
 
 
-def read_psi4_sapt0(filename):
+def read_psi4_sapt0_with_snapnum_and_weight(filename):
+    snapnum_to_bin_map = make_snapnum_to_bin_map()
     sapt_data = dict()
     stub = os.path.splitext(os.path.basename(filename))[0]
     stub_tokens = stub.split('_')
     snapnum = int(stub_tokens[1])
     binnum = snapnum_to_bin_map[snapnum]
-    weight = bin_to_weight_map[binnum]
+    weight = BIN_TO_WEIGHT_MAP[binnum]
     sapt_data['snapnum'] = snapnum
     sapt_data['weight'] = weight
     fi = make_file_iterator(filename)
@@ -293,9 +292,9 @@ def read_psi4_sapt0(filename):
     # data.
     for line in fi:
         # Dimer results always come before monomer results.
-        if any(sapt_header in line for sapt_header in sapt_headers_dimer):
+        if any(sapt_header in line for sapt_header in SAPT_HEADERS_DIMER):
             sapt_data['dimer'] = read_psi4_sapt_section(fi)
-        if any(sapt_header in line for sapt_header in sapt_headers_monomer):
+        if any(sapt_header in line for sapt_header in SAPT_HEADERS_MONOMER):
             sapt_data['monomer'] = read_psi4_sapt_section(fi)
             break
 

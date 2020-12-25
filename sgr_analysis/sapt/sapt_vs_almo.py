@@ -8,7 +8,7 @@ import os.path
 
 import numpy as np
 
-from sgr_analysis.sapt.helpers import (bin_to_weight_map, read_psi4_sapt0,
+from sgr_analysis.sapt.helpers import (BIN_TO_WEIGHT_MAP, read_psi4_sapt0_with_snapnum_and_weight,
                                        read_qchem_eda, snapnum_to_bin_map)
 
 from sgr_analysis.sapt.summary import method_basis_outer_product
@@ -89,7 +89,7 @@ if __name__ == '__main__':
             almo_data[method][cp_flag][snapnum] = almo_data_snap
 
     snapnums = sorted(snapnums)
-    weights = [bin_to_weight_map[snapnum_to_bin_map[snapnum]]
+    weights = [BIN_TO_WEIGHT_MAP[snapnum_to_bin_map[snapnum]]
                for snapnum in snapnums]
 
     ## Start by writing all the ALMO data to a CSV file.
@@ -141,11 +141,11 @@ if __name__ == '__main__':
         snapnum = int(stub_tokens[1])
         assert snapnum in snapnums
         snapnums_sapt.add(snapnum)
-        sapt_data_snap = read_psi4_sapt0(filename)
+        sapt_data_snap = read_psi4_sapt0_with_snapnum_and_weight(filename)
         sapt_data[snapnum] = sapt_data_snap
 
     snapnums_sapt = sorted(snapnums_sapt)
-    weights_sapt = [bin_to_weight_map[snapnum_to_bin_map[snapnum]]
+    weights_sapt = [BIN_TO_WEIGHT_MAP[snapnum_to_bin_map[snapnum]]
                     for snapnum in snapnums_sapt]
 
     csvfh = open('data_all.csv', 'w')

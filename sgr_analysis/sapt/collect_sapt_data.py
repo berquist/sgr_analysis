@@ -4,7 +4,7 @@ interaction energy components, writing to a CSV file."""
 
 import os.path
 
-from sgr_analysis.sapt.helpers import (read_psi4_sapt0, sapt_bases)
+from sgr_analysis.sapt.helpers import (read_psi4_sapt0_with_snapnum_and_weight, SAPT_BASES)
 
 
 if __name__ == '__main__':
@@ -73,9 +73,9 @@ if __name__ == '__main__':
 
         print(filename)
 
-        sapt_data = read_psi4_sapt0(filename)
+        sapt_data = read_psi4_sapt0_with_snapnum_and_weight(filename)
 
-        for sapt_basis in sapt_bases:
+        for sapt_basis in SAPT_BASES:
 
             if sapt_basis in sapt_data:
 

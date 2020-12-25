@@ -35,7 +35,7 @@ setup(
     # subpackage(s) from being added, if needed
     packages=find_packages(),
     include_package_data=True,
-    setup_requires=[] + pytest_runner,
+    setup_requires=["cclib", "numpy", "pandas", "scipy"] + pytest_runner,
 
     # Additional entries you may want simply uncomment the lines you want and fill in the data
     # url='http://www.my_package.com',  # Website
