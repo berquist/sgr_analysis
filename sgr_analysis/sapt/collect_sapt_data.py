@@ -1,8 +1,6 @@
 """collect_sapt_data.py: Parse a set of SAPT0 output files for their
 interaction energy components, writing to a CSV file."""
 
-from __future__ import division
-from __future__ import print_function
 
 import os.path
 

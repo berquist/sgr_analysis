@@ -9,8 +9,6 @@ there were modified into an Excel file and a bunch of correlation
 plots were added by hand. Reproduce them.
 """
 
-from __future__ import division
-from __future__ import print_function
 
 from glob import glob
 import os.path

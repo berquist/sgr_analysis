@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
 from glob import glob
 import os
 from mbe.utils import pad_left_zeros

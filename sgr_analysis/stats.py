@@ -6,7 +6,6 @@ This script should be run from within each 'inputs_freq_{n_qm}'
 directory.
 """
 
-from __future__ import print_function
 
 import os
 

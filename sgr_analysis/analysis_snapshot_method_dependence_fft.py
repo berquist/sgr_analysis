@@ -11,8 +11,6 @@ fewer than that, and the amount varies. It is simply for convenience.
 
 """
 
-from __future__ import print_function
-from __future__ import division
 
 import sys
 sys.path.append('/home/eric/Chemistry/aimd')
